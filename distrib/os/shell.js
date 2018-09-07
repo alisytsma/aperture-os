@@ -13,7 +13,7 @@
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
 (function (TSOS) {
-    var Shell = (function () {
+    var Shell = /** @class */ (function () {
         function Shell() {
             // Properties
             this.promptStr = ">";
@@ -48,6 +48,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
+            this.commandList[this.commandList.length] = sc;
+            // prompt <string>
+            sc = new TSOS.ShellCommand(this.shellRoll, "roll", "- Roll for initiative.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -89,13 +92,13 @@ var TSOS;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) {
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
                     this.execute(this.shellCurse);
                 }
-                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
                     this.execute(this.shellApology);
                 }
-                else {
+                else { // It's just a bad command. {
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -246,7 +249,27 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellRoll = function () {
+            var playerResult = Math.floor(Math.random() * 20) + 1;
+            var enemyResult = Math.floor(Math.random() * 20) + 1;
+            var damage = Math.floor(Math.random() * 5) + 1;
+            var playerHealth = 10;
+            var enemyHealth = 10;
+            _StdOut.putText("A challenger approaches. ");
+            _StdOut.putText("You've rolled a " + playerResult + " for initiative. ");
+            _StdOut.putText("The challenger rolled a " + enemyResult + " for initiative. ");
+            if (enemyResult > playerResult) {
+                playerHealth -= damage;
+                _StdOut.putText("The challenger attacks. They deal " + damage + " damage. " +
+                    "Your health is now " + playerHealth);
+            }
+            else {
+                enemyHealth -= damage;
+                _StdOut.putText("You attack. You deal " + damage + "damage. " +
+                    "The challenger's health is now " + enemyHealth);
+            }
+        };
         return Shell;
-    })();
+    }());
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

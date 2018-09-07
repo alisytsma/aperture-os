@@ -79,6 +79,12 @@ module TSOS {
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
+            // prompt <string>
+            sc = new ShellCommand(this.shellRoll,
+                "roll",
+                "- Roll for initiative.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -285,6 +291,28 @@ module TSOS {
             } else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
+        }
+
+        public shellRoll() {
+            var playerResult = Math.floor(Math.random() * 20) + 1;
+            var enemyResult = Math.floor(Math.random() * 20) + 1;
+            var damage = Math.floor(Math.random() * 5) + 1;
+            var playerHealth = 10;
+            var enemyHealth = 10;
+            _StdOut.putText("A challenger approaches. ");
+            _StdOut.putText("You've rolled a " + playerResult + " for initiative. ");
+            _StdOut.putText("The challenger rolled a " + enemyResult + " for initiative. ");
+
+            if(enemyResult > playerResult){
+                playerHealth -= damage;
+                _StdOut.putText("The challenger attacks. They deal " + damage + " damage. " +
+                    "Your health is now " + playerHealth);
+            } else {
+                enemyHealth -= damage;
+                _StdOut.putText("You attack. You deal " + damage + "damage. " +
+                    "The challenger's health is now " + enemyHealth);
+            }
+
         }
 
     }
