@@ -74,7 +74,6 @@ var TSOS;
         };
         Console.prototype.advanceLine = function () {
             this.currentXPosition = 0;
-            //var storeText = _Canvas.
             /*
              * Font size measures from the baseline to the highest point in the font.
              * Font descent measures from the baseline to the lowest point in the font.
@@ -84,14 +83,6 @@ var TSOS;
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
-            if (this.currentYPosition > _Canvas.height) {
-                this.currentYPosition -= _DefaultFontSize +
-                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-                    _FontHeightMargin;
-                //this.clearScreen();
-                _StdOut.putText(_KernelBuffers.toString());
-                _StdOut.putText(" ");
-            }
         };
         return Console;
     }());
