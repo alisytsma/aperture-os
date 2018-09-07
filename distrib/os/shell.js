@@ -49,8 +49,14 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-            // prompt <string>
+            // roll
             sc = new TSOS.ShellCommand(this.shellRoll, "roll", "- Roll for initiative.");
+            this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new TSOS.ShellCommand(this.shellLocation, "whereami", "- Display location.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -223,6 +229,12 @@ var TSOS;
                     case "prompt":
                         _StdOut.putText("Prompt sets the input prompt for the console.");
                         break;
+                    case "date":
+                        _StdOut.putText("Date prints the current time and date in your timezone.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays your current location in the universe.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -314,6 +326,23 @@ var TSOS;
                     _StdOut.advanceLine();
                     _StdOut.putText("They failed. You have defeated the challenger.");
                 }
+            }
+        };
+        Shell.prototype.shellDate = function () {
+            _StdOut.advanceLine();
+            var today = new Date();
+            var date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            _StdOut.putText("It is " + time + " on " + date);
+        };
+        Shell.prototype.shellLocation = function () {
+            if (_SarcasticMode) {
+                _StdOut.advanceLine();
+                _StdOut.putText("How about you go outside for once in your life and look?");
+            }
+            else {
+                _StdOut.advanceLine();
+                _StdOut.putText("Earth, I'd assume");
             }
         };
         return Shell;
