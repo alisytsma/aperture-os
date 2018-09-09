@@ -290,6 +290,7 @@ module TSOS {
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
+
             } else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
             }
@@ -381,7 +382,6 @@ module TSOS {
         }
 
         public shellDate(){
-            _StdOut.advanceLine();
             var today = new Date();
             var date = (today.getMonth()+1) + "/" + today.getDate() + "/" + today.getFullYear();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -390,11 +390,9 @@ module TSOS {
 
         public shellLocation(){
             if(_SarcasticMode){
-                _StdOut.advanceLine();
                 _StdOut.putText("How about you go outside for once in your life and look?");
             } else {
-                _StdOut.advanceLine();
-                _StdOut.putText("Earth, I'd assume");
+                _StdOut.putText("Earth, I'd assume.");
             }
         }
     }

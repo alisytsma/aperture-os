@@ -329,7 +329,6 @@ var TSOS;
             }
         };
         Shell.prototype.shellDate = function () {
-            _StdOut.advanceLine();
             var today = new Date();
             var date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -337,12 +336,10 @@ var TSOS;
         };
         Shell.prototype.shellLocation = function () {
             if (_SarcasticMode) {
-                _StdOut.advanceLine();
                 _StdOut.putText("How about you go outside for once in your life and look?");
             }
             else {
-                _StdOut.advanceLine();
-                _StdOut.putText("Earth, I'd assume");
+                _StdOut.putText("Earth, I'd assume.");
             }
         };
         return Shell;
