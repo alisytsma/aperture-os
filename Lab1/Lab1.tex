@@ -1,0 +1,29 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[latin1]{inputenc}
+
+\title{Lab 1 Questions}
+\author{Ali Sytsma}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\begin{enumerate}
+  \item What are the advantages and disadvantages of using the same system call interface for manipulating both files and devices? 
+  \begin{itemize} 
+  \item The advantages of using the same system call interface for manipulating both files and devices would be that each device can be accessed like it is a file within the file system. It is easy to add device drivers because the kernel handles devices through the file interface. This also benefits code writing as user program code can access devices and files in the same manner and device-driver code can support a well-defined API. The disadvantages of this, however, would be that it can be difficult to capture certain device’s functionality in the context of the file access API, resulting in a loss of functionality or performance. The ioctl operation, which provides an interface for processes to invoke operations on devices, could help resolve some of this.
+  \end{itemize}
+  \item Would it be possible for the user to develop a new command interpreter using the system call interface provide by the operating system? How?
+  \begin{itemize} 
+  \item Yes, it is possible for the user to develop a new command interpreter using a system call interface. The command interpreter allows processes to be created and managed by the user, and determines how they communicate. Fr example, through pipes and files. All of this is accessible through system calls by a user level program, so it should also be possible for the user to develop a new command-line interpreter.
+  \end{itemize}
+  
+\end{enumerate}
+
+
+
+\end{document}
