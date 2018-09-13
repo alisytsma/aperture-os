@@ -406,7 +406,7 @@ module TSOS {
         }
 
         public shellStatus(args){
-
+            _StdOut.putText("Status set to " + args);
         }
     }
 }
