@@ -17,7 +17,8 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    public storeText = "") {
         }
 
         public init(): void {
@@ -66,39 +67,64 @@ module TSOS {
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
+                this.storeText = text;
+                //create array to store lines that go off page
+                var lines = [];
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
-                if (this.currentXPosition > _Canvas.width) {
-                    _StdOut.advanceLine();
+                //if text will go off canvas
+                if (offset + this.currentXPosition > _Canvas.width - 20) {
+                    //loop through all text
+                    for (var i = 0; i < text.length; i++) {
+                        //set offset to be the spliced text instead of the regular text
+                        var spliceOffset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text.slice(0, i));
+                        //add both pre-spliced text and post-spliced text to array lines and set x position back to 0
+                        if (this.currentXPosition + spliceOffset > _Canvas.width - 20) {
+                            lines.push(text.slice(0, i - 1));
+                            text = text.slice(i - 1);
+                            lines.push(text);
+                            this.currentXPosition = 0;
+                        }
+                    }
+                    //print array lines with line break
+                    for (var i = 0; i < lines.length - 1; i++) {
+                        this.putText(lines[i]);
+                        this.advanceLine();
+                    }
                 }
+
+                //draw rest of text
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                this.currentXPosition = this.currentXPosition + offset;
+
             }
-         }
+        }
 
         public advanceLine(): void {
             this.currentXPosition = 0;
-            //var storeText = _Canvas.
             /*
              * Font size measures from the baseline to the highest point in the font.
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
-            this.currentYPosition += _DefaultFontSize + 
-                                     _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-                                     _FontHeightMargin;
 
-            // TODO: Handle scrolling. (iProject 1)
-            if(this.currentYPosition > _Canvas.height){
-                 this.currentYPosition -= _DefaultFontSize +
-                    _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-                    _FontHeightMargin;
-                //this.clearScreen();
-                _StdOut.putText(_KernelBuffers.toString());
-                _StdOut.putText(" ");
+            //find line height
+            var lineHeight = _DefaultFontSize +
+                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin;
 
+            //move y position down by line height
+            this.currentYPosition += lineHeight;
+
+            //if the text would go off the canvas
+            if (this.currentYPosition >= _Canvas.height) {
+                //copy the currently displayed text by getting the image data
+                var getDisplayedText = _DrawingContext.getImageData(0, 0, _Canvas.width, _Canvas.height);
+                this.clearScreen();
+                //move the y position up one so the text fits (minus the top line)
+                this.currentYPosition -= lineHeight;
+                //re-display the text by putting the image data back on the canvas
+                _DrawingContext.putImageData(getDisplayedText, 0, -lineHeight);
             }
         }
     }
- }
+}

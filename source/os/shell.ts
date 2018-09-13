@@ -397,6 +397,7 @@ module TSOS {
             _StdOut.putText("It is " + time + " on " + date);
         }
 
+
         public shellLocation(){
             if(_SarcasticMode){
                 _StdOut.putText("How about you go outside for once in your life and look?");
