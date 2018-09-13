@@ -23,6 +23,7 @@ module TSOS {
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
 
+
         constructor() {
         }
 
@@ -33,56 +34,74 @@ module TSOS {
 
             // ver
             sc = new ShellCommand(this.shellVer,
-                                  "ver",
-                                  "- Displays the current version data.");
+                "ver",
+                "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
 
             // help
             sc = new ShellCommand(this.shellHelp,
-                                  "help",
-                                  "- This is the help command. Seek help.");
+                "help",
+                "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
 
             // shutdown
             sc = new ShellCommand(this.shellShutdown,
-                                  "shutdown",
-                                  "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+                "shutdown",
+                "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
 
             // cls
             sc = new ShellCommand(this.shellCls,
-                                  "cls",
-                                  "- Clears the screen and resets the cursor position.");
+                "cls",
+                "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
 
             // man <topic>
             sc = new ShellCommand(this.shellMan,
-                                  "man",
-                                  "<topic> - Displays the MANual page for <topic>.");
+                "man",
+                "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
 
             // trace <on | off>
             sc = new ShellCommand(this.shellTrace,
-                                  "trace",
-                                  "<on | off> - Turns the OS trace on or off.");
+                "trace",
+                "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
 
             // rot13 <string>
             sc = new ShellCommand(this.shellRot13,
-                                  "rot13",
-                                  "<string> - Does rot13 obfuscation on <string>.");
+                "rot13",
+                "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
 
             // prompt <string>
             sc = new ShellCommand(this.shellPrompt,
-                                  "prompt",
-                                  "<string> - Sets the prompt.");
+                "prompt",
+                "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
-            // prompt <string>
+            // roll
             sc = new ShellCommand(this.shellRoll,
                 "roll",
                 "- Roll for initiative.");
+            this.commandList[this.commandList.length] = sc;
+
+            // date
+            sc = new ShellCommand(this.shellDate,
+                "date",
+                "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+
+            // whereami
+            sc = new ShellCommand(this.shellLocation,
+                "whereami",
+                "- Display location.");
+            this.commandList[this.commandList.length] = sc;
+
+            // status
+            sc = new ShellCommand(this.shellStatus,
+                "status",
+                "<string> - Set status message.");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -202,14 +221,14 @@ module TSOS {
         }
 
         public shellApology() {
-           if (_SarcasticMode) {
-              _StdOut.putText("I think we can put our differences behind us.");
-              _StdOut.advanceLine();
-              _StdOut.putText("For science . . . You monster.");
-              _SarcasticMode = false;
-           } else {
-              _StdOut.putText("For what?");
-           }
+            if (_SarcasticMode) {
+                _StdOut.putText("I think we can put our differences behind us.");
+                _StdOut.advanceLine();
+                _StdOut.putText("For science . . . You monster.");
+                _SarcasticMode = false;
+            } else {
+                _StdOut.putText("For what?");
+            }
         }
 
         public shellVer(args) {
@@ -225,8 +244,8 @@ module TSOS {
         }
 
         public shellShutdown(args) {
-             _StdOut.putText("Shutting down...");
-             // Call Kernel shutdown routine.
+            _StdOut.putText("Shutting down...");
+            // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
@@ -244,9 +263,43 @@ module TSOS {
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "roll":
+                        _StdOut.putText("Roll begins a (very) short game of Dungeons and Dragons.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears all the text on the console.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Man provides more details about commands.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shutdown powers off the virtual OS but leaves processes running.");
+                        break;
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version of TSOS.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace <on | off> enables or disables the OS trace.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 <string> performs rot13 encryption on the entered string.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt sets the input prompt for the console.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Date prints the current time and date in your timezone.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays your current location in the universe.");
+                        break;
+                    case "status":
+                        _StdOut.putText("Status <string> sets the status message on the task bar.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
+
             } else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
             }
@@ -294,26 +347,66 @@ module TSOS {
         }
 
         public shellRoll() {
+            var damage = Math.floor(Math.random() * 5) + 1;
             var playerResult = Math.floor(Math.random() * 20) + 1;
             var enemyResult = Math.floor(Math.random() * 20) + 1;
-            var damage = Math.floor(Math.random() * 5) + 1;
-            var playerHealth = 10;
-            var enemyHealth = 10;
+            var luckRoll = Math.floor(Math.random() * 20) + 1;
+
             _StdOut.putText("A challenger approaches. ");
+            _StdOut.advanceLine();
             _StdOut.putText("You've rolled a " + playerResult + " for initiative. ");
+            _StdOut.advanceLine();
             _StdOut.putText("The challenger rolled a " + enemyResult + " for initiative. ");
 
             if(enemyResult > playerResult){
-                playerHealth -= damage;
-                _StdOut.putText("The challenger attacks. They deal " + damage + " damage. " +
-                    "Your health is now " + playerHealth);
-            } else {
-                enemyHealth -= damage;
-                _StdOut.putText("You attack. You deal " + damage + "damage. " +
-                    "The challenger's health is now " + enemyHealth);
-            }
+                _StdOut.advanceLine();
+                _StdOut.putText("The challenger attacks. They deal " + damage + " damage. ");
+                _StdOut.advanceLine();
+                _StdOut.putText("You are bleeding and attempt to run away.");
+                _StdOut.advanceLine();
+                _StdOut.putText("You roll a " + luckRoll + ". ");
+                if (luckRoll >= 10 ) {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("You have successfully evaded your attacker.");
+                } else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("You failed. You have been defeated by the challenger.");
+                }
 
+            } else {
+                _StdOut.advanceLine();
+                _StdOut.putText("You attack. You deal " + damage + " damage. ");
+                _StdOut.advanceLine();
+                _StdOut.putText("They are bleeding and attempt to run away.");
+                _StdOut.advanceLine();
+                _StdOut.putText("They roll a " + luckRoll + ". ");
+                if (luckRoll >= 10) {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("They have successfully evaded you.");
+                } else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("They failed. You have defeated the challenger.");
+                }
+            }
         }
 
+        public shellDate(){
+            var today = new Date();
+            var date = (today.getMonth()+1) + "/" + today.getDate() + "/" + today.getFullYear();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            _StdOut.putText("It is " + time + " on " + date);
+        }
+
+        public shellLocation(){
+            if(_SarcasticMode){
+                _StdOut.putText("How about you go outside for once in your life and look?");
+            } else {
+                _StdOut.putText("Earth, I'd assume.");
+            }
+        }
+
+        public shellStatus(args){
+
+        }
     }
 }
