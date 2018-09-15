@@ -10,19 +10,23 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, storeText) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, storeText, storeInput, arrowNavValue) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
             if (storeText === void 0) { storeText = ""; }
+            if (storeInput === void 0) { storeInput = []; }
+            if (arrowNavValue === void 0) { arrowNavValue = -1; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
             this.storeText = storeText;
+            this.storeInput = storeInput;
+            this.arrowNavValue = arrowNavValue;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -46,17 +50,44 @@ var TSOS;
                 var chr = _KernelInputQueue.dequeue();
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
+                    //check to see if the navigation has been used
+                    if (this.arrowNavValue > -1) {
+                        this.buffer += this.storeInput[this.arrowNavValue];
+                        this.arrowNavValue = -1;
+                    }
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    //add it to store input array for arrow navigation
+                    this.storeInput.unshift(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(9)) { //tab
-                    this.putText("tab");
+                    _StdOut.putText("tab");
                 }
                 else if (chr === String.fromCharCode(8)) { //backspace
                     this.backspace();
+                }
+                else if (chr === String.fromCharCode(38)) { //up arrow
+                    //if there are input values left in array, allow to keep going
+                    if (this.arrowNavValue < this.storeInput.length - 1) {
+                        //increase position in array, clear the line, and print out the input value
+                        this.arrowNavValue++;
+                        this.clearLine();
+                        _StdOut.putText(_OsShell.promptStr);
+                        _StdOut.putText(this.storeInput[this.arrowNavValue]);
+                    }
+                }
+                else if (chr === String.fromCharCode(40)) { //down arrow
+                    //don't allow to navigate past 0
+                    if (this.arrowNavValue > 0) {
+                        //decrease position in array, clear the line, and print out the input value
+                        this.arrowNavValue--;
+                        this.clearLine();
+                        _StdOut.putText(_OsShell.promptStr);
+                        _StdOut.putText(this.storeInput[this.arrowNavValue]);
+                    }
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -134,7 +165,8 @@ var TSOS;
         Console.prototype.backspace = function () {
             this.buffer = this.buffer.substring(0, this.buffer.length - 1);
             this.clearLine();
-            _StdOut.putText(">" + this.buffer);
+            _StdOut.putText(_OsShell.promptStr + this.buffer);
+            this.arrowNavValue = -1;
         };
         return Console;
     }());
