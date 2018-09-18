@@ -350,8 +350,11 @@ var TSOS;
             }
         };
         Shell.prototype.shellStatus = function (args) {
+            //set status equal to input
             this.status = args;
+            //print update that status has been changed
             _StdOut.putText("Status set to " + args);
+            //update status on host
             document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
         };
         return Shell;

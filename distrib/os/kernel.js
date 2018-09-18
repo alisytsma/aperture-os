@@ -39,8 +39,8 @@ var TSOS;
             //
             // ... more?
             //
+            //set status
             document.getElementById("status").innerHTML = "Status: Running | ";
-            //document.getElementById("taskBar").innerHTML = "Status: " + _OsShell.status + " | Time: " + Date.now();
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -153,15 +153,12 @@ var TSOS;
                     TSOS.Control.hostLog(msg, "OS");
                 }
             }
+            //create displayDate and displayTime to get date and time
             var displayDate = new Date().toLocaleDateString();
             var displayTime = new Date();
-            var hours = displayTime.getHours();
-            var minutes = displayTime.getMinutes();
-            var seconds = displayTime.getSeconds();
-            document.getElementById("time").innerHTML = "Time: " + displayDate + " "
-                + hours + ":" + minutes + ":" + seconds;
-            //document.getElementById("taskBar").innerHTML = " | Time: " + displayDate + " "
-            //  + displayTime.getHours() + ":" + displayTime.getMinutes() + ":" + displayTime.getSeconds();
+            //Update time in task bar
+            document.getElementById("time").innerHTML = "Time: " + displayDate + " " + displayTime.getHours()
+                + ":" + displayTime.getMinutes() + ":" + displayTime.getSeconds();
         };
         Kernel.prototype.krnTrapError = function (msg) {
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
