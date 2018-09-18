@@ -65,6 +65,9 @@ var TSOS;
             // load
             sc = new TSOS.ShellCommand(this.load, "load", " - Load and validate user input.");
             this.commandList[this.commandList.length] = sc;
+            // bluescreen
+            sc = new TSOS.ShellCommand(this.blueScreen, "bluescreen", " - Force an error that causes blue screen.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -245,6 +248,12 @@ var TSOS;
                     case "status":
                         _StdOut.putText("Status <string> sets the status message on the task bar.");
                         break;
+                    case "load":
+                        _StdOut.putText("Load loads the content in the User Progam Input box and checks if it is valid hex or not.");
+                        break;
+                    case "bluescreen":
+                        _StdOut.putText("Bluescreen forces the OS to bluescreen, or causes a fatal kernel error that requires restarting.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -377,6 +386,10 @@ var TSOS;
             }
             if (valid)
                 _StdOut.putText("Valid hex input.");
+        };
+        //force a kernel error
+        Shell.prototype.blueScreen = function () {
+            _Kernel.krnTrapError("Error caused by user");
         };
         return Shell;
     }());
