@@ -10,7 +10,7 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, storeText, storeInput, arrowNavValue) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, storeText, storeInput, arrowNavValue, tabCount, storeCommands) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
@@ -19,6 +19,8 @@ var TSOS;
             if (storeText === void 0) { storeText = ""; }
             if (storeInput === void 0) { storeInput = []; }
             if (arrowNavValue === void 0) { arrowNavValue = -1; }
+            if (tabCount === void 0) { tabCount = 0; }
+            if (storeCommands === void 0) { storeCommands = []; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
@@ -27,6 +29,8 @@ var TSOS;
             this.storeText = storeText;
             this.storeInput = storeInput;
             this.arrowNavValue = arrowNavValue;
+            this.tabCount = tabCount;
+            this.storeCommands = storeCommands;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -64,7 +68,8 @@ var TSOS;
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(9)) { //tab
-                    _StdOut.putText("tab");
+                    this.autoComplete(this.buffer);
+                    this.tabCount++;
                 }
                 else if (chr === String.fromCharCode(8)) { //backspace
                     this.backspace();
@@ -167,6 +172,19 @@ var TSOS;
             this.clearLine();
             _StdOut.putText(_OsShell.promptStr + this.buffer);
             this.arrowNavValue = -1;
+        };
+        Console.prototype.autoComplete = function (args) {
+            for (var i = 0; i < _OsShell.commandList.length; i++) {
+                if (_OsShell.commandList[i].command.includes(args)) {
+                    this.storeCommands.push(_OsShell.commandList[i].command);
+                }
+            }
+            this.clearLine();
+            _StdOut.putText(_OsShell.promptStr + this.storeCommands[this.tabCount]);
+            this.buffer = this.storeCommands[this.tabCount];
+            if (this.tabCount >= this.storeCommands.length) {
+                this.tabCount = 0;
+            }
         };
         return Console;
     }());

@@ -20,7 +20,9 @@ module TSOS {
                     public buffer = "",
                     public storeText = "",
                     public storeInput = [],
-                    public arrowNavValue = -1) {
+                    public arrowNavValue = -1,
+                    public tabCount = 0,
+                    public storeCommands = []) {
         }
 
         public init(): void {
@@ -62,7 +64,8 @@ module TSOS {
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else if (chr === String.fromCharCode(9)) { //tab
-                    _StdOut.putText("tab");
+                    this.autoComplete(this.buffer);
+                    this.tabCount++;
                 } else if (chr === String.fromCharCode(8)) { //backspace
                     this.backspace();
                 } else if (chr === String.fromCharCode(38)) { //up arrow
@@ -169,6 +172,20 @@ module TSOS {
             this.clearLine();
             _StdOut.putText( _OsShell.promptStr + this.buffer);
             this.arrowNavValue = -1;
+        }
+
+        public autoComplete(args): void {
+            for(var i = 0; i < _OsShell.commandList.length; i++ ){
+                if(_OsShell.commandList[i].command.includes(args)){
+                    this.storeCommands.push(_OsShell.commandList[i].command);
+                }
+            }
+            this.clearLine();
+            _StdOut.putText(_OsShell.promptStr + this.storeCommands[this.tabCount]);
+            this.buffer = this.storeCommands[this.tabCount];
+            if(this.tabCount >= this.storeCommands.length){
+                this.tabCount = 0;
+            }
         }
     }
 }
