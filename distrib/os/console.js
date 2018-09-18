@@ -93,6 +93,22 @@ var TSOS;
                         _StdOut.putText(_OsShell.promptStr);
                         _StdOut.putText(this.storeInput[this.arrowNavValue]);
                     }
+                    //handle unshifted special character
+                }
+                else if (chr === String.fromCharCode(187)) {
+                    _StdOut.putText("=");
+                }
+                else if (chr === String.fromCharCode(188)) {
+                    _StdOut.putText(",");
+                }
+                else if (chr === String.fromCharCode(189)) {
+                    _StdOut.putText("-");
+                }
+                else if (chr === String.fromCharCode(190)) {
+                    _StdOut.putText(".");
+                }
+                else if (chr === String.fromCharCode(191)) {
+                    _StdOut.putText("/");
                 }
                 else {
                     // This is a "normal" character, so ...

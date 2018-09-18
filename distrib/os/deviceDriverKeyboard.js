@@ -66,9 +66,69 @@ var TSOS;
                 (keyCode == 8) || //backspace
                 (keyCode == 9) || //tab
                 (keyCode == 38) || //up arrow
-                (keyCode == 40)) { //down arrow
-                chr = String.fromCharCode(keyCode);
+                (keyCode == 40) || //down arrow
+                ((keyCode >= 187) && (keyCode <= 191))) { //minus, equals, comma, period, question mark
+                //if a digit or special character and shifted
+                if ((((keyCode >= 48) && (keyCode <= 57) || ((keyCode >= 187) && (keyCode <= 191))) && isShifted))
+                    chr = this.getCharacter(keyCode);
+                else
+                    chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
+            }
+        };
+        DeviceDriverKeyboard.prototype.getCharacter = function (keyCode) {
+            //return the special characters for the key codes
+            switch (keyCode) {
+                case 48:
+                    return ")";
+                    break;
+                case 49:
+                    return "!";
+                    break;
+                case 50:
+                    return "@";
+                    break;
+                case 51:
+                    return "#";
+                    break;
+                case 52:
+                    return "$";
+                    break;
+                case 53:
+                    return "%";
+                    break;
+                case 54:
+                    return "^";
+                    break;
+                //print directly to console if & because otherwise arrow up command happens
+                case 55:
+                    _StdOut.putText("&");
+                    break;
+                case 56:
+                    return "*";
+                    break;
+                //print directly to console if ( because otherwise nothing happens
+                case 57:
+                    _StdOut.putText("(");
+                    break;
+                case 58:
+                    return ")";
+                    break;
+                case 187:
+                    return "+";
+                    break;
+                case 188:
+                    return "<";
+                    break;
+                case 189:
+                    return "_";
+                    break;
+                case 190:
+                    return ">";
+                    break;
+                case 191:
+                    return "?";
+                    break;
             }
         };
         return DeviceDriverKeyboard;
