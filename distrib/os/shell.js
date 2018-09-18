@@ -371,7 +371,7 @@ var TSOS;
         };
         Shell.prototype.load = function () {
             var input = (document.getElementById("taProgramInput").value);
-            _StdOut.putText("Loading: " + input);
+            _StdOut.putText("Loading...");
             _StdOut.advanceLine();
             var valid = true;
             for (var i = 0; i < input.length; i++) {
@@ -379,7 +379,7 @@ var TSOS;
                     valid = true;
                 }
                 else {
-                    _StdOut.putText("Not valid hex input.");
+                    _StdOut.putText("Character " + input.charAt(i) + " at position " + i + " is not valid hex input.");
                     valid = false;
                     break;
                 }

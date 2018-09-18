@@ -436,14 +436,14 @@ module TSOS {
 
         public load(){
             var input = ((document.getElementById("taProgramInput") as HTMLInputElement).value);
-            _StdOut.putText("Loading: " + input);
+            _StdOut.putText("Loading...");
             _StdOut.advanceLine();
             var valid = true;
             for(var i = 0; i < input.length; i++) {
                 if (input.charAt(i).match("-?[0-9a-fA-F\\s]+")) {
                     valid = true;
                 } else {
-                    _StdOut.putText("Not valid hex input.");
+                    _StdOut.putText("Character " + input.charAt(i) + " at position " + i + " is not valid hex input.");
                     valid = false;
                     break;
                 }
