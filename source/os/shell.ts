@@ -105,6 +105,12 @@ module TSOS {
                 "<string> - Set status message.");
             this.commandList[this.commandList.length] = sc;
 
+            // load
+            sc = new ShellCommand(this.load,
+                "load",
+                " - Load and validate user input.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -414,6 +420,25 @@ module TSOS {
             _StdOut.putText("Status set to " + args);
             //update status on host
             document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
+        }
+
+        public load(){
+            var input = ((document.getElementById("taProgramInput") as HTMLInputElement).value);
+            _StdOut.putText("Loading: " + input);
+            _StdOut.advanceLine();
+            var valid = true;
+            for(var i = 0; i < input.length; i++) {
+                if (input.charAt(i).match("-?[0-9a-fA-F\\s]+")) {
+                    valid = true;
+                } else {
+                    _StdOut.putText("Not valid hex input.");
+                    valid = false;
+                    break;
+                }
+            }
+            if(valid)
+                _StdOut.putText("Valid hex input.");
+
 
         }
     }
