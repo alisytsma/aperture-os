@@ -19,6 +19,7 @@ module TSOS {
         //
         // OS Startup and Shutdown Routines
         //
+
         public krnBootstrap() {      // Page 8. {
             Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
@@ -44,6 +45,10 @@ module TSOS {
             //
             // ... more?
             //
+
+            document.getElementById("status").innerHTML = "Status: Running | ";
+
+            //document.getElementById("taskBar").innerHTML = "Status: " + _OsShell.status + " | Time: " + Date.now();
 
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
@@ -169,6 +174,18 @@ module TSOS {
                     Control.hostLog(msg, "OS");
                 }
              }
+
+            var displayDate = new Date().toLocaleDateString();
+            var displayTime = new Date();
+            var hours = displayTime.getHours();
+            var minutes = displayTime.getMinutes();
+            var seconds = displayTime.getSeconds();
+
+            document.getElementById("time").innerHTML = "Time: " + displayDate + " "
+                + hours + ":" + minutes + ":" + seconds;
+
+            //document.getElementById("taskBar").innerHTML = " | Time: " + displayDate + " "
+              //  + displayTime.getHours() + ":" + displayTime.getMinutes() + ":" + displayTime.getSeconds();
         }
 
         public krnTrapError(msg) {

@@ -22,6 +22,7 @@ module TSOS {
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
+        public status = "Running";
 
 
         constructor() {
@@ -407,7 +408,10 @@ module TSOS {
         }
 
         public shellStatus(args){
+            this.status = args;
             _StdOut.putText("Status set to " + args);
+            document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
+
         }
     }
 }

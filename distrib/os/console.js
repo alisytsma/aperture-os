@@ -173,15 +173,21 @@ var TSOS;
             _StdOut.putText(_OsShell.promptStr + this.buffer);
             this.arrowNavValue = -1;
         };
-        Console.prototype.autoComplete = function (args) {
+        Console.prototype.autoComplete = function (input) {
+            //loop through all commands
             for (var i = 0; i < _OsShell.commandList.length; i++) {
-                if (_OsShell.commandList[i].command.includes(args)) {
+                //compare input to commandlist
+                if (_OsShell.commandList[i].command.includes(input)) {
+                    //if input matches, push to array
                     this.storeCommands.push(_OsShell.commandList[i].command);
                 }
             }
+            //clear line and print text
             this.clearLine();
             _StdOut.putText(_OsShell.promptStr + this.storeCommands[this.tabCount]);
+            //add it to buffer
             this.buffer = this.storeCommands[this.tabCount];
+            //loop back if reached end
             if (this.tabCount >= this.storeCommands.length) {
                 this.tabCount = 0;
             }
