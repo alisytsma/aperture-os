@@ -1,4 +1,4 @@
-Grade: branch Lab 1
+Grade: branch iProject1
 
 Browser-based Operating System in TypeScript
 ============================================
