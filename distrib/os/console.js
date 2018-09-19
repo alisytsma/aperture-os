@@ -93,7 +93,7 @@ var TSOS;
                         _StdOut.putText(_OsShell.promptStr);
                         _StdOut.putText(this.storeInput[this.arrowNavValue]);
                     }
-                    //handle unshifted special character
+                    //handle unshifted special characters
                 }
                 else if (chr === String.fromCharCode(187)) {
                     _StdOut.putText("=");
