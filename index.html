@@ -15,8 +15,10 @@
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
 
-   <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+
+    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
    <script type="text/javascript" src="distrib/os/canvastext.js"></script>
    <script type="text/javascript" src="distrib/os/console.js"></script>
@@ -103,6 +105,33 @@
          ></textarea>
       </label>
    </div>
+   <div id="divMemory" style="margin-left:520px;">
+       <label>Memory</label>
+   </div>
+    <div id="divCpu" style="margin-left:520px;">
+        <label>
+            CPU
+            <br>
+            <table id = "tableCpu">
+            <tr style = "font-weight:bold">
+                <td>PC</td>
+                <td>IR</td>
+                <td>Acc</td>
+                <td>X</td>
+                <td>Y</td>
+                <td>ZF</td>
+            </tr>
+            <tr>
+                <td id = "PC"></td>
+                <td id = "IR"></td>
+                <td id = "Acc"></td>
+                <td id = "Xreg"></td>
+                <td id = "Yreg"></td>
+                <td id = "Zflag"></td>
+            </tr>
+            </table>
+        </label>
+    </div>
 </div>
 
 <p class="footerText" style="clear:both;">

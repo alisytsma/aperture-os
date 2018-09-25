@@ -35,12 +35,28 @@ module TSOS {
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+
+            document.getElementById("PC").innerHTML = this.PC.toString();
+            document.getElementById("Acc").innerHTML = this.Acc.toString();
+            document.getElementById("Xreg").innerHTML = this.Xreg.toString();
+            document.getElementById("Yreg").innerHTML = this.Yreg.toString();
+            document.getElementById("Zflag").innerHTML = this.Zflag.toString();
         }
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+            document.getElementById("PC").innerHTML = this.PC.toString();
+            document.getElementById("Acc").innerHTML = this.Acc.toString();
+            document.getElementById("Xreg").innerHTML = this.Xreg.toString();
+            document.getElementById("Yreg").innerHTML = this.Yreg.toString();
+            document.getElementById("Zflag").innerHTML = this.Zflag.toString();
+
+            //LDA - A9, AD
+            //STA - 8D
+
         }
     }
 }

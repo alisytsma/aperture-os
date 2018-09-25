@@ -37,6 +37,7 @@ var _KernelBuffers = null; // when clearly 'any' is not what we want. There is l
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;
+var _Memory;
 // UI
 var _Console;
 var _OsShell;

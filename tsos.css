@@ -46,3 +46,13 @@ h3 {
   font-size: 8pt;
   text-align: center;
 }
+
+table {
+  table-layout: fixed;
+  width: 500px;
+  background-color: white;
+  padding: 10px
+}
+table td {
+  width: 75px;
+}

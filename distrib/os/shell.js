@@ -21,6 +21,7 @@ var TSOS;
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
             this.status = "Running";
+            this.pidCount = 0;
         }
         Shell.prototype.init = function () {
             var sc;
@@ -388,8 +389,10 @@ var TSOS;
                 valid = false;
                 _StdOut.putText("No text entered, not valid hex input.");
             }
-            if (valid)
-                _StdOut.putText("Valid hex input.");
+            if (valid) {
+                _StdOut.putText("Loaded with a PID of " + this.pidCount);
+                this.pidCount++;
+            }
         };
         //force a kernel error
         Shell.prototype.blueScreen = function () {

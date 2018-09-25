@@ -23,6 +23,7 @@ module TSOS {
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
         public status = "Running";
+        public pidCount = 0;
 
 
         constructor() {
@@ -453,8 +454,10 @@ module TSOS {
                 valid = false;
                 _StdOut.putText("No text entered, not valid hex input.");
             }
-            if(valid)
-                _StdOut.putText("Valid hex input.");
+            if(valid) {
+                _StdOut.putText("Loaded with a PID of " + this.pidCount);
+                this.pidCount++;
+            }
         }
 
         //force a kernel error
