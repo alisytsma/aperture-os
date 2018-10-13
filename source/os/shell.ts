@@ -440,6 +440,8 @@ module TSOS {
         public load(){
             var input = ((document.getElementById("taProgramInput") as HTMLInputElement).value);
             var valid = true;
+            var startReg = 0;
+            var endReg = 0;
             _StdOut.putText("Loading...");
             _StdOut.advanceLine();
 
@@ -459,6 +461,23 @@ module TSOS {
             if(valid) {
                 _OsShell.pidCount += 1;
                 _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                var countRow = 0;
+                var countCol = 0;
+                for (var i = 0; i < input.length; i++) {
+                    if(input.charAt(i) != " ") {
+                        _Memory.memArray[countRow][countCol] = input.substring(i, i + 2);
+                        console.log("Substring: " + input.substring(i, i + 2));
+                        i+=2;
+                        if(countCol < 7) {
+                            countCol++;
+                        } else {
+                            countCol = 0;
+                            countRow++;
+                        }
+                    }
+                }
+                console.log(_Memory.memArray.toString());
+               // _Canvas.createTable();
             }
         }
 

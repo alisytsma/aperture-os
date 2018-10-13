@@ -1,14 +1,14 @@
 ///<reference path="../globals.ts" />
 
 /* ------------
-     MemoryAccessor.ts
+     ProcessManager.ts
 
      Requires global.ts.
      ------------ */
 
 module TSOS {
 
-    export class MemoryAccessor {
+    export class ProcessManager {
 
         constructor() {
 
@@ -18,5 +18,4 @@ module TSOS {
 
         }
     }
-
 }

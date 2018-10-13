@@ -84,6 +84,7 @@ var TSOS;
             //create new memory instance
             _Memory = new TSOS.Memory();
             _Memory.init();
+            this.createTable();
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
@@ -100,6 +101,42 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        Control.createTable = function () {
+            var tableDiv = document.getElementById("divMemory");
+            var tbl = document.createElement('table');
+            tbl.setAttribute("id", "tableMemory");
+            var memNum = 0;
+            for (var i = 0; i < 32; i++) {
+                var tr = tbl.insertRow();
+                for (var j = 0; j < 9; j++) {
+                    var td = tr.insertCell();
+                    if (j == 0) {
+                        if (memNum < 10)
+                            td.appendChild(document.createTextNode("0x00" + memNum));
+                        else if (memNum < 100)
+                            td.appendChild(document.createTextNode("0x0" + memNum));
+                        else
+                            td.appendChild(document.createTextNode("0x" + memNum));
+                    }
+                    else {
+                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayCountRow][_Memory.memArrayCountColumn]));
+                        if (_Memory.memArrayCountColumn < 7) {
+                            _Memory.memArrayCountColumn++;
+                        }
+                        else {
+                            _Memory.memArrayCountColumn = 0;
+                            _Memory.memArrayCountRow++;
+                        }
+                    }
+                }
+                memNum += 8;
+            }
+            tableDiv.appendChild(tbl);
+            //tbl.setAttribute('color','blue');
+            document.getElementById("tableMemory").style.height = '100px';
+            document.getElementById("tableMemory").style.overflow = 'auto';
+            document.getElementById("tableMemory").style.border = '1px solid black';
         };
         return Control;
     }());

@@ -58,3 +58,5 @@ var _Memory;
 var _MemoryAccessor;
 //	Software	(OS)
 var _MemoryManager = null;
+var _ProcessManager;
+var _ProcessControlBlock;

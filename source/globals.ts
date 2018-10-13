@@ -77,3 +77,6 @@ var	_Memory:	TSOS.Memory;
 var	_MemoryAccessor:	TSOS.MemoryAccessor;
 //	Software	(OS)
 var	_MemoryManager:	any	=	null;
+var _ProcessManager: TSOS.ProcessManager;
+var _ProcessControlBlock: TSOS.ProcessControlBlock;
+
