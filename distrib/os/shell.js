@@ -390,8 +390,8 @@ var TSOS;
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if (valid) {
-                _StdOut.putText("Loaded with a PID of " + this.pidCount);
-                this.pidCount++;
+                _OsShell.pidCount += 1;
+                _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
             }
         };
         //force a kernel error

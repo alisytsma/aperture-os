@@ -21,6 +21,7 @@ module TSOS {
 
         constructor(public PC: number = 0,
                     public Acc: number = 0,
+                    public IR: number = 0,
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
@@ -31,6 +32,7 @@ module TSOS {
         public init(): void {
             this.PC = 0;
             this.Acc = 0;
+            this.IR = 0;
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
@@ -38,6 +40,7 @@ module TSOS {
 
             document.getElementById("PC").innerHTML = this.PC.toString();
             document.getElementById("Acc").innerHTML = this.Acc.toString();
+            document.getElementById("IR").innerHTML = this.IR.toString();
             document.getElementById("Xreg").innerHTML = this.Xreg.toString();
             document.getElementById("Yreg").innerHTML = this.Yreg.toString();
             document.getElementById("Zflag").innerHTML = this.Zflag.toString();
@@ -50,13 +53,13 @@ module TSOS {
 
             document.getElementById("PC").innerHTML = this.PC.toString();
             document.getElementById("Acc").innerHTML = this.Acc.toString();
+            document.getElementById("IR").innerHTML = this.IR.toString();
             document.getElementById("Xreg").innerHTML = this.Xreg.toString();
             document.getElementById("Yreg").innerHTML = this.Yreg.toString();
             document.getElementById("Zflag").innerHTML = this.Zflag.toString();
 
             //LDA - A9, AD
             //STA - 8D
-
         }
     }
 }

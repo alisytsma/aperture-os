@@ -52,3 +52,9 @@ var _GLaDOS = null; // If the above is linked in, this is the instantiated insta
 var onDocumentLoad = function () {
     TSOS.Control.hostInit();
 };
+//	Hardware	(host)
+var _CPU;
+var _Memory;
+var _MemoryAccessor;
+//	Software	(OS)
+var _MemoryManager = null;

@@ -26,6 +26,7 @@ module TSOS {
         public pidCount = 0;
 
 
+
         constructor() {
         }
 
@@ -39,6 +40,7 @@ module TSOS {
                 "ver",
                 "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+
 
             // help
             sc = new ShellCommand(this.shellHelp,
@@ -246,7 +248,7 @@ module TSOS {
         }
 
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION)
         }
 
         public shellHelp(args) {
@@ -455,8 +457,8 @@ module TSOS {
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if(valid) {
-                _StdOut.putText("Loaded with a PID of " + this.pidCount);
-                this.pidCount++;
+                _OsShell.pidCount += 1;
+                _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
             }
         }
 
