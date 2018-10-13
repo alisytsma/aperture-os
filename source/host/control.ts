@@ -26,6 +26,7 @@
 module TSOS {
 
     export class Control {
+        public static tbl  = document.createElement('table');
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
@@ -102,7 +103,7 @@ module TSOS {
             _Memory = new Memory();
             _Memory.init();
 
-            this.createTable();
+            this.loadTable();
 
         }
 
@@ -124,43 +125,69 @@ module TSOS {
             // page from its cache, which is not what we want.
         }
 
-        public static createTable():void {
+        //function to clear the memory table
+        public static clearTable():void{
             var tableDiv = document.getElementById("divMemory");
-            var tbl  = document.createElement('table');
-            tbl.setAttribute("id", "tableMemory");
+            //loop down to delete every row
+            for(var i = this.tbl.rows.length - 1; i >= 0; i--)
+                this.tbl.deleteRow(i);
+            //make the table disappear
+            tableDiv.removeChild(this.tbl);
+        }
+
+        //function to update the memory table
+        public static loadTable():void {
+            //find table div and set id
+            var tableDiv = document.getElementById("divMemory");
+            this.tbl.setAttribute("id", "tableMemory");
+            //set equal to number that memory column header should be equal to
             var memNum = 0;
 
+            //loop through 32 times to create 32 rows
             for(var i = 0; i < 32; i++){
-                var tr = tbl.insertRow();
+                var tr = this.tbl.insertRow();
+                //create 9 columns in those rows
                 for(var j = 0; j < 9; j++){
                     var td = tr.insertCell();
+                    //if first in column
                     if(j == 0) {
+                        //if single digit, add 0x00 in front
                         if(memNum < 10)
                             td.appendChild(document.createTextNode("0x00" + memNum));
+                        //if two digits, add 0x0 in front
                         else if(memNum < 100)
                             td.appendChild(document.createTextNode("0x0" + memNum));
+                        //if three digits, add 0x in front
                         else
                             td.appendChild(document.createTextNode("0x" + memNum));
                     }
+                    //if not first in column
                     else {
-                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayCountRow][_Memory.memArrayCountColumn]));
+                        //add memory value to cell
+                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayCountColumn][_Memory.memArrayCountRow]));
 
-                        if(_Memory.memArrayCountColumn < 7) {
-                            _Memory.memArrayCountColumn++;
-                        } else {
-                            _Memory.memArrayCountColumn = 0;
+                        //if not at the end of the row, increment row count
+                        if(_Memory.memArrayCountRow < 7) {
                             _Memory.memArrayCountRow++;
+                        //if at the end of the row, set row count to 0 and go to the next column
+                        } else {
+                            _Memory.memArrayCountRow = 0;
+                            _Memory.memArrayCountColumn++;
                         }
 
                     }
                 }
+                //increment column header by 8
                 memNum += 8;
             }
-            tableDiv.appendChild(tbl);
-            //tbl.setAttribute('color','blue');
+            //add to page
+            tableDiv.appendChild(this.tbl);
+            //set height and overflow of memory table
             document.getElementById("tableMemory").style.height = '100px';
             document.getElementById("tableMemory").style.overflow = 'auto';
-            document.getElementById("tableMemory").style.border = '1px solid black';
+            //reset counters to 0
+            _Memory.memArrayCountColumn = 0;
+            _Memory.memArrayCountRow = 0;
         }
     }
 }

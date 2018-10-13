@@ -55,14 +55,7 @@ module TSOS {
 
         public init(): void {
 
-                this.printTable();
-
         }
 
-
-
-        public printTable(): void{
-
-        }
     }
 }

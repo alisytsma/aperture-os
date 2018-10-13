@@ -410,8 +410,8 @@ var TSOS;
                         }
                     }
                 }
-                console.log(_Memory.memArray.toString());
-                // _Canvas.createTable();
+                TSOS.Control.clearTable();
+                TSOS.Control.loadTable();
             }
         };
         //force a kernel error
