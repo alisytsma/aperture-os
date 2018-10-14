@@ -120,6 +120,12 @@ module TSOS {
                 " - Force an error that causes blue screen.");
             this.commandList[this.commandList.length] = sc;
 
+            // run
+            sc = new ShellCommand(this.run,
+                "run",
+                "<integer> - Run a command by process id.");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -459,7 +465,6 @@ module TSOS {
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if(valid) {
-                _OsShell.pidCount += 1;
                 _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                 var countRow = 0;
                 var countCol = 0;
@@ -478,6 +483,10 @@ module TSOS {
                 }
                 TSOS.Control.clearTable();
                 TSOS.Control.loadTable();
+                var newProc = new ProcessControlBlock(_OsShell.pidCount,"Ready",0,0,0,0,0,0);
+                _ProcessManager.readyQueue.push(newProc);
+                newProc.init();
+                _OsShell.pidCount += 1;
 
             }
         }
@@ -485,6 +494,16 @@ module TSOS {
         //force a kernel error
         public blueScreen(){
             _Kernel.krnTrapError("Error caused by user");
+        }
+
+        //run a program
+        public run(args){
+           /* if(_ProcessControlBlock.processId == args){
+                _StdOut.putText("Running process " + _ProcessControlBlock.processId);
+
+            }*/
+           console.log(_ProcessControlBlock.processId);
+
         }
     }
 }

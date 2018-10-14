@@ -8,14 +8,18 @@
       TSOS - a browser-based virtual Operating System in TypeScript
    </title>
 
+
+
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
 
-   <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+
+    <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
    <script type="text/javascript" src="distrib/host/memory.js"></script>
+    <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
 
 
     <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
@@ -25,12 +29,21 @@
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
    <script type="text/javascript" src="distrib/os/queue.js"></script>
+   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+   <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
    <script type="text/javascript" src="distrib/os/shell.js"></script>
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
-   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
 
-   <!-- Other Routines -->
+
+
+
+
+
+
+
+    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
    <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
@@ -129,6 +142,34 @@
                 <td id = "Yreg"></td>
                 <td id = "Zflag"></td>
             </tr>
+            </table>
+        </label>
+    </div>
+    <div id="divPCB" style="margin-left:520px;">
+        <label>
+            Process Control Block
+            <br>
+            <table id = "tablePCB">
+                <tr style = "font-weight:bold">
+                    <td>PID</td>
+                    <td>Status</td>
+                    <td>PC</td>
+                    <td>IR</td>
+                    <td>Acc</td>
+                    <td>X</td>
+                    <td>Y</td>
+                    <td>ZF</td>
+                </tr>
+                <tr>
+                    <td id = "pcbPID"></td>
+                    <td id = "pcbStatus"></td>
+                    <td id = "pcbPC"></td>
+                    <td id = "pcbIR"></td>
+                    <td id = "pcbAcc"></td>
+                    <td id = "pcbXreg"></td>
+                    <td id = "pcbYreg"></td>
+                    <td id = "pcbZflag"></td>
+                </tr>
             </table>
         </label>
     </div>
