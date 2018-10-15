@@ -17,12 +17,12 @@ var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
         function Cpu(PC, Acc, IR, Xreg, Yreg, Zflag, isExecuting) {
-            if (PC === void 0) { PC = 0; }
-            if (Acc === void 0) { Acc = 0; }
-            if (IR === void 0) { IR = 0; }
-            if (Xreg === void 0) { Xreg = 0; }
-            if (Yreg === void 0) { Yreg = 0; }
-            if (Zflag === void 0) { Zflag = 0; }
+            if (PC === void 0) { PC = "0"; }
+            if (Acc === void 0) { Acc = "0"; }
+            if (IR === void 0) { IR = "0"; }
+            if (Xreg === void 0) { Xreg = "0"; }
+            if (Yreg === void 0) { Yreg = "0"; }
+            if (Zflag === void 0) { Zflag = "0"; }
             if (isExecuting === void 0) { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
@@ -33,12 +33,12 @@ var TSOS;
             this.isExecuting = isExecuting;
         }
         Cpu.prototype.init = function () {
-            this.PC = 0;
-            this.Acc = 0;
-            this.IR = 0;
-            this.Xreg = 0;
-            this.Yreg = 0;
-            this.Zflag = 0;
+            this.PC = "0";
+            this.Acc = "0";
+            this.IR = "0";
+            this.Xreg = "0";
+            this.Yreg = "0";
+            this.Zflag = "0";
             this.isExecuting = false;
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
@@ -48,12 +48,65 @@ var TSOS;
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
-        Cpu.prototype.opCodes = function (opcode) {
-            switch (opcode) {
+        Cpu.prototype.opCodes = function (input, column, row, pid, status) {
+            console.log("Case: " + input);
+            var arg = "00";
+            switch (input) {
+                //A9 - load acc with const, 1 arg
                 case "A9":
+                    if (row < 7) {
+                        arg = _Memory.memArray[column][row + 1];
+                    }
+                    else {
+                        row = 0;
+                        arg = _Memory.memArray[column][row + 1];
+                    }
+                    this.Acc = arg;
+                    TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+                    TSOS.Control.updatePCB(pid, status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+                    console.log("Program: " + input + arg);
+                    break;
+                //AD - load from mem, 2 arg
+                case "AD":
+                    console.log("Code AD");
+                    break;
+                case "8D":
+                    console.log("Code 8D");
+                    break;
+                case "6D":
+                    console.log("Code 6D");
+                    break;
+                case "A2":
+                    console.log("Code A2");
+                    break;
+                case "AE":
+                    console.log("Code AE");
+                    break;
+                case "A0":
+                    console.log("Code A0");
+                    break;
+                case "AC":
+                    console.log("Code AC");
+                    break;
+                case "EA":
+                    console.log("Code EA");
+                    break;
+                case "00":
+                    console.log("Code 00");
+                    break;
+                case "EC":
+                    console.log("Code EC");
+                    break;
+                case "D0":
+                    console.log("Code D0");
+                    break;
+                case "EE":
+                    console.log("Code EE");
+                    break;
+                case "FF":
+                    console.log("Code FF");
+                    break;
             }
-            //A9 - load acc with const, 1 arg
-            //AD - load from mem, 2 arg
             //8D - store acc in mem, 2 arg
             //6D - add with carry, 2 arg
             //A2 - load x reg with constant, 1 arg

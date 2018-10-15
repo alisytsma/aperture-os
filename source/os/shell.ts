@@ -22,7 +22,7 @@ module TSOS {
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
-        public status = "Running";
+        public status = "Ready";
         public pidCount = 0;
 
 
@@ -445,12 +445,15 @@ module TSOS {
         public load(){
             var input = ((document.getElementById("taProgramInput") as HTMLInputElement).value);
             var valid = true;
-            var startReg = 0;
-            var endReg = 0;
             _StdOut.putText("Loading...");
             _StdOut.advanceLine();
 
             for(var i = 0; i < input.length; i++) {
+                if(((i + 1) % 3 == 0) && input.charAt(i) != " "){
+                    _StdOut.putText("Must add a space at position " + i);
+                    valid = false;
+                    break;
+                }
                 if (input.charAt(i).match("-?[0-9a-fA-F\\s]+")) {
                     valid = true;
                 } else {

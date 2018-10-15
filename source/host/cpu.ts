@@ -19,23 +19,22 @@ module TSOS {
 
     export class Cpu {
 
-        constructor(public PC: number = 0,
-                    public Acc: number = 0,
-                    public IR: number = 0,
-                    public Xreg: number = 0,
-                    public Yreg: number = 0,
-                    public Zflag: number = 0,
+        constructor(public PC: string = "0",
+                    public Acc: string = "0",
+                    public IR: string = "0",
+                    public Xreg: string = "0",
+                    public Yreg: string = "0",
+                    public Zflag: string = "0",
                     public isExecuting: boolean = false) {
-
         }
 
         public init(): void {
-            this.PC = 0;
-            this.Acc = 0;
-            this.IR = 0;
-            this.Xreg = 0;
-            this.Yreg = 0;
-            this.Zflag = 0;
+            this.PC = "0";
+            this.Acc = "0";
+            this.IR = "0";
+            this.Xreg = "0";
+            this.Yreg = "0";
+            this.Zflag = "0";
             this.isExecuting = false;
 
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
@@ -50,15 +49,65 @@ module TSOS {
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         }
 
-        public opCodes(opcode: string): void {
+        public opCodes(input: string, column: number, row: number, pid: string, status: string): void {
+            console.log("Case: " + input);
+            var arg = "00";
 
-            switch(opcode){
+            switch(input){
+                //A9 - load acc with const, 1 arg
                 case "A9":
-
-
+                    if(row < 7) {
+                        arg = _Memory.memArray[column][row + 1];
+                    } else {
+                        row = 0;
+                        arg = _Memory.memArray[column][row + 1];
+                    }
+                    this.Acc = arg;
+                    TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+                    TSOS.Control.updatePCB(pid, status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+                    console.log("Program: " + input + arg);
+                    break;
+                //AD - load from mem, 2 arg
+                case "AD":
+                    console.log("Code AD");
+                    break;
+                case "8D":
+                    console.log("Code 8D");
+                    break;
+                case "6D":
+                    console.log("Code 6D");
+                    break;
+                case "A2":
+                    console.log("Code A2");
+                    break;
+                case "AE":
+                    console.log("Code AE");
+                    break;
+                case "A0":
+                    console.log("Code A0");
+                    break;
+                case "AC":
+                    console.log("Code AC");
+                    break;
+                case "EA":
+                    console.log("Code EA");
+                    break;
+                case "00":
+                    console.log("Code 00");
+                    break;
+                case "EC":
+                    console.log("Code EC");
+                    break;
+                case "D0":
+                    console.log("Code D0");
+                    break;
+                case "EE":
+                    console.log("Code EE");
+                    break;
+                case "FF":
+                    console.log("Code FF");
+                    break;
             }
-            //A9 - load acc with const, 1 arg
-            //AD - load from mem, 2 arg
             //8D - store acc in mem, 2 arg
             //6D - add with carry, 2 arg
             //A2 - load x reg with constant, 1 arg

@@ -192,24 +192,24 @@ module TSOS {
             _Memory.memArrayCountRow = 0;
         }
 
-        public static updatePCB(pid: number, status: string, pc: number, acc: number, ir: number, xreg: number, yreg: number, zflag: number): void {
-            document.getElementById("pcbPID").innerHTML = pid.toString();
+        public static updatePCB(pid: string, status: string, pc: string, acc: string, ir: string, xreg: string, yreg: string, zflag: string): void {
+            document.getElementById("pcbPID").innerHTML = pid;
             document.getElementById("pcbStatus").innerHTML = status;
-            document.getElementById("pcbPC").innerHTML = pc.toString();
-            document.getElementById("pcbAcc").innerHTML = acc.toString();
-            document.getElementById("pcbIR").innerHTML = ir.toString();
-            document.getElementById("pcbXreg").innerHTML = xreg.toString();
-            document.getElementById("pcbYreg").innerHTML = yreg.toString();
-            document.getElementById("pcbZflag").innerHTML = zflag.toString();
+            document.getElementById("pcbPC").innerHTML = pc;
+            document.getElementById("pcbAcc").innerHTML = acc;
+            document.getElementById("pcbIR").innerHTML = ir;
+            document.getElementById("pcbXreg").innerHTML = xreg;
+            document.getElementById("pcbYreg").innerHTML = yreg;
+            document.getElementById("pcbZflag").innerHTML = zflag;
         }
 
-        public static updateCPU(PC: number, Acc: number, IR: number, Xreg: number, Yreg: number, Zflag: number): void {
-            document.getElementById("PC").innerHTML = PC.toString();
-            document.getElementById("Acc").innerHTML = Acc.toString();
-            document.getElementById("IR").innerHTML = IR.toString();
-            document.getElementById("Xreg").innerHTML = Xreg.toString();
-            document.getElementById("Yreg").innerHTML = Yreg.toString();
-            document.getElementById("Zflag").innerHTML = Zflag.toString();
+        public static updateCPU(PC: string, Acc: string, IR: string, Xreg: string, Yreg: string, Zflag: string): void {
+            document.getElementById("PC").innerHTML = PC;
+            document.getElementById("Acc").innerHTML = Acc;
+            document.getElementById("IR").innerHTML = IR;
+            document.getElementById("Xreg").innerHTML = Xreg;
+            document.getElementById("Yreg").innerHTML = Yreg;
+            document.getElementById("Zflag").innerHTML = Zflag;
         }
     }
 }

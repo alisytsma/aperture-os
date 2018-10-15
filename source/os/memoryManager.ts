@@ -22,7 +22,7 @@ module TSOS {
             var countCol = 0;
             for (var i = 0; i < input.length; i++) {
                 if(input.charAt(i) != " ") {
-                    _Memory.memArray[countRow][countCol] = input.substring(i, i + 2);
+                    _Memory.memArray[countRow][countCol] = input.substring(i, i + 2).toUpperCase();
                     i+=2;
                     if(countCol < 7) {
                         countCol++;
