@@ -165,6 +165,24 @@ var TSOS;
             _Memory.memArrayCountColumn = 0;
             _Memory.memArrayCountRow = 0;
         };
+        Control.updatePCB = function (pid, status, pc, acc, ir, xreg, yreg, zflag) {
+            document.getElementById("pcbPID").innerHTML = pid.toString();
+            document.getElementById("pcbStatus").innerHTML = status;
+            document.getElementById("pcbPC").innerHTML = pc.toString();
+            document.getElementById("pcbAcc").innerHTML = acc.toString();
+            document.getElementById("pcbIR").innerHTML = ir.toString();
+            document.getElementById("pcbXreg").innerHTML = xreg.toString();
+            document.getElementById("pcbYreg").innerHTML = yreg.toString();
+            document.getElementById("pcbZflag").innerHTML = zflag.toString();
+        };
+        Control.updateCPU = function (PC, Acc, IR, Xreg, Yreg, Zflag) {
+            document.getElementById("PC").innerHTML = PC.toString();
+            document.getElementById("Acc").innerHTML = Acc.toString();
+            document.getElementById("IR").innerHTML = IR.toString();
+            document.getElementById("Xreg").innerHTML = Xreg.toString();
+            document.getElementById("Yreg").innerHTML = Yreg.toString();
+            document.getElementById("Zflag").innerHTML = Zflag.toString();
+        };
         Control.tbl = document.createElement('table');
         return Control;
     }());

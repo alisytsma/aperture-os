@@ -38,12 +38,8 @@ module TSOS {
             this.Zflag = 0;
             this.isExecuting = false;
 
-            document.getElementById("PC").innerHTML = this.PC.toString();
-            document.getElementById("Acc").innerHTML = this.Acc.toString();
-            document.getElementById("IR").innerHTML = this.IR.toString();
-            document.getElementById("Xreg").innerHTML = this.Xreg.toString();
-            document.getElementById("Yreg").innerHTML = this.Yreg.toString();
-            document.getElementById("Zflag").innerHTML = this.Zflag.toString();
+            TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+
         }
 
         public cycle(): void {
@@ -51,15 +47,30 @@ module TSOS {
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            document.getElementById("PC").innerHTML = this.PC.toString();
-            document.getElementById("Acc").innerHTML = this.Acc.toString();
-            document.getElementById("IR").innerHTML = this.IR.toString();
-            document.getElementById("Xreg").innerHTML = this.Xreg.toString();
-            document.getElementById("Yreg").innerHTML = this.Yreg.toString();
-            document.getElementById("Zflag").innerHTML = this.Zflag.toString();
+            TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+        }
 
-            //LDA - A9, AD
-            //STA - 8D
+        public opCodes(opcode: string): void {
+
+            switch(opcode){
+                case "A9":
+
+
+            }
+            //A9 - load acc with const, 1 arg
+            //AD - load from mem, 2 arg
+            //8D - store acc in mem, 2 arg
+            //6D - add with carry, 2 arg
+            //A2 - load x reg with constant, 1 arg
+            //AE - load x reg from mem, 2 arg
+            //A0 - load y reg with const, 1 arg
+            //AC - load y reg from mem. 2 arg
+            //EA - no op, 0 arg
+            //00 - break, 0 arg
+            //EC - compare a byte in mem to the x reg, 2 arg
+            //D0 - branch n bytes if z flag = 0, 1 arg
+            //EE - increment the value of a byte, 2 args
+            //FF - system call
         }
     }
 }

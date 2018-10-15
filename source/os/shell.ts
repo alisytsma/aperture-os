@@ -26,7 +26,6 @@ module TSOS {
         public pidCount = 0;
 
 
-
         constructor() {
         }
 
@@ -466,28 +465,8 @@ module TSOS {
             }
             if(valid) {
                 _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
-                var countRow = 0;
-                var countCol = 0;
-                for (var i = 0; i < input.length; i++) {
-                    if(input.charAt(i) != " ") {
-                        _Memory.memArray[countRow][countCol] = input.substring(i, i + 2);
-                        console.log("Substring: " + input.substring(i, i + 2));
-                        i+=2;
-                        if(countCol < 7) {
-                            countCol++;
-                        } else {
-                            countCol = 0;
-                            countRow++;
-                        }
-                    }
-                }
-                TSOS.Control.clearTable();
-                TSOS.Control.loadTable();
-                var newProc = new ProcessControlBlock(_OsShell.pidCount,"Ready",0,0,0,0,0,0);
-                _ProcessManager.readyQueue.push(newProc);
-                newProc.init();
-                _OsShell.pidCount += 1;
-
+                TSOS.MemoryManager.updateMemory(input.toString());
+                _Kernel.createProcess(_OsShell.pidCount);
             }
         }
 
@@ -498,11 +477,7 @@ module TSOS {
 
         //run a program
         public run(args){
-           /* if(_ProcessControlBlock.processId == args){
-                _StdOut.putText("Running process " + _ProcessControlBlock.processId);
-
-            }*/
-           console.log(_ProcessControlBlock.processId);
+            TSOS.MemoryAccessor.runProgram(args);
 
         }
     }

@@ -1,5 +1,4 @@
 ///<reference path="../globals.ts" />
-
 /* ------------
      ProcessControlBlock.ts
 
@@ -14,22 +13,27 @@
      This code references page numbers in the text book:
      Operating System Concepts 8th edition by Silberschatz, Galvin, and Gagne.  ISBN 978-0-470-12872-5
      ------------ */
-
-module TSOS {
-
-    export class ProcessControlBlock {
-
-        constructor(public processId: number,
-                    public status: string = "Ready",
-                    public PC: number = 0,
-                    public Acc: number = 0,
-                    public IR: number = 0,
-                    public Xreg: number = 0,
-                    public Yreg: number = 0,
-                    public Zflag: number = 0) {
+var TSOS;
+(function (TSOS) {
+    var ProcessControlBlock = /** @class */ (function () {
+        function ProcessControlBlock(processId, status, PC, Acc, IR, Xreg, Yreg, Zflag) {
+            if (status === void 0) { status = "Ready"; }
+            if (PC === void 0) { PC = 0; }
+            if (Acc === void 0) { Acc = 0; }
+            if (IR === void 0) { IR = 0; }
+            if (Xreg === void 0) { Xreg = 0; }
+            if (Yreg === void 0) { Yreg = 0; }
+            if (Zflag === void 0) { Zflag = 0; }
+            this.processId = processId;
+            this.status = status;
+            this.PC = PC;
+            this.Acc = Acc;
+            this.IR = IR;
+            this.Xreg = Xreg;
+            this.Yreg = Yreg;
+            this.Zflag = Zflag;
         }
-
-        public init(): void {
+        ProcessControlBlock.prototype.init = function () {
             this.status = "Ready";
             this.PC = 0;
             this.Acc = 0;
@@ -37,9 +41,9 @@ module TSOS {
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
-
             TSOS.Control.updatePCB(this.processId, this.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-        }
-
-    }
-}
+        };
+        return ProcessControlBlock;
+    }());
+    TSOS.ProcessControlBlock = ProcessControlBlock;
+})(TSOS || (TSOS = {}));

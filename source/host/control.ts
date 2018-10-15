@@ -129,7 +129,7 @@ module TSOS {
         }
 
         //function to clear the memory table
-        public static clearTable():void{
+        public static clearTable():void {
             var tableDiv = document.getElementById("divMemory");
             //loop down to delete every row
             for(var i = this.tbl.rows.length - 1; i >= 0; i--)
@@ -177,7 +177,6 @@ module TSOS {
                             _Memory.memArrayCountRow = 0;
                             _Memory.memArrayCountColumn++;
                         }
-
                     }
                 }
                 //increment column header by 8
@@ -191,6 +190,26 @@ module TSOS {
             //reset counters to 0
             _Memory.memArrayCountColumn = 0;
             _Memory.memArrayCountRow = 0;
+        }
+
+        public static updatePCB(pid: number, status: string, pc: number, acc: number, ir: number, xreg: number, yreg: number, zflag: number): void {
+            document.getElementById("pcbPID").innerHTML = pid.toString();
+            document.getElementById("pcbStatus").innerHTML = status;
+            document.getElementById("pcbPC").innerHTML = pc.toString();
+            document.getElementById("pcbAcc").innerHTML = acc.toString();
+            document.getElementById("pcbIR").innerHTML = ir.toString();
+            document.getElementById("pcbXreg").innerHTML = xreg.toString();
+            document.getElementById("pcbYreg").innerHTML = yreg.toString();
+            document.getElementById("pcbZflag").innerHTML = zflag.toString();
+        }
+
+        public static updateCPU(PC: number, Acc: number, IR: number, Xreg: number, Yreg: number, Zflag: number): void {
+            document.getElementById("PC").innerHTML = PC.toString();
+            document.getElementById("Acc").innerHTML = Acc.toString();
+            document.getElementById("IR").innerHTML = IR.toString();
+            document.getElementById("Xreg").innerHTML = Xreg.toString();
+            document.getElementById("Yreg").innerHTML = Yreg.toString();
+            document.getElementById("Zflag").innerHTML = Zflag.toString();
         }
     }
 }
