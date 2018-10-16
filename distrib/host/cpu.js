@@ -71,7 +71,7 @@ var TSOS;
             //mark single step as false
             TSOS.Control.disableSingleStep();
             //set memory back to 0
-            TSOS.MemoryAccessor.clearMem();
+            //TSOS.MemoryAccessor.clearMem();
             //reset table
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
@@ -198,23 +198,40 @@ var TSOS;
                     break;
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
-                    this.IR = "D0";
+                    /*this.IR = "D0";
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = this.convertHex(addr);
                     var goTo = (this.convertHex(arg));
                     console.log("go to1: " + goTo + ", position: " + this.position + ", add: " + (this.position + goTo));
-                    if ((+this.Zflag) == 0) {
+                    if((+this.Zflag) == 0){
                         console.log("previous pos: " + this.position);
-                        if ((goTo + this.position) >= 256) {
+                        if((goTo + this.position) >= 256){
                             this.position = (goTo + this.position) - 256;
                             console.log("too big " + this.position);
-                        }
-                        else {
+                        } else {
                             this.position = goTo + this.position;
                         }
                         console.log("go to2: " + goTo + ", position: " + this.position);
                     }
                     this.position += 1;
+                    // get the branch value from memory
+                    var branch = TSOS.MemoryAccessor.readMemory(this.PC + 1);
+                    var branchAddress = parseInt(branch, 16) + this.PC;
+                    // console.log(`PC > ${this.PC}`, ` Branch > ${branchAddress}`);
+                    // if the branch will exceed the memory, go back to 0
+                    if (branchAddress > TSOS.MemoryManager.endProgram - 1) {
+                        branchAddress = branchAddress % 256;
+                    }
+                    // Add 2 to account for the branch op and the location
+                    this.PC = branchAddress + 2;*/
+                    if ((+this.Zflag) == 0) {
+                        this.PC = (this.position + 2 + TSOS.MemoryAccessor.readMemory(+(this.position) + 1)) % TSOS.MemoryManager.endProgram;
+                    }
+                    else {
+                        this.PC += 2;
+                    }
+                    this.position = this.PC;
+                    console.log("Z Pos: " + this.position);
                     break;
                 //EE - increment the value of a byte, 2 args
                 case "EE":
@@ -236,7 +253,8 @@ var TSOS;
                     var stringBuilder = "";
                     console.log("FF: " + this.Xreg);
                     if ((+this.Xreg) == 1) {
-                        _StdOut.putText(this.Yreg);
+                        console.log("FF y reg: " + this.Yreg);
+                        _StdOut.putText(this.Yreg.toString());
                     }
                     else if ((+this.Xreg) == 2) {
                         var stringBuilder = "";
@@ -264,6 +282,8 @@ var TSOS;
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
         //function to convert string to hex
+        //did not realize this was already built in cause I'm dumb
+        //leaving it anyway cause I took the time to make it
         Cpu.prototype.convertHex = function (hex) {
             var add = 0;
             console.log("Var: " + hex + ", 2: " + hex[2] + " 3: " + hex[3]);

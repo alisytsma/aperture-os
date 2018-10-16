@@ -10,6 +10,8 @@ module TSOS {
 
     export class MemoryManager {
 
+        public static endProgram;
+
         public static updateMemory(input: string):void{
             console.log("Before: " + _Memory.memArray.toString());
             var position = 0;
@@ -20,7 +22,8 @@ module TSOS {
                     position++;
                 }
             }
-            console.log("After: " + _Memory.memArray.toString());
+            this.endProgram = position;
+            console.log("After: " + _Memory.memArray.toString() + " length: " + this.endProgram);
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
         }

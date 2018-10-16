@@ -76,7 +76,7 @@ module TSOS {
             //mark single step as false
             TSOS.Control.disableSingleStep();
             //set memory back to 0
-            TSOS.MemoryAccessor.clearMem();
+            //TSOS.MemoryAccessor.clearMem();
             //reset table
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
@@ -219,22 +219,13 @@ module TSOS {
 
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
-                    this.IR = "D0";
-                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
-                    arg = this.convertHex(addr);
-                    var goTo = (this.convertHex(arg));
-                    console.log("go to1: " + goTo + ", position: " + this.position + ", add: " + (this.position + goTo));
-                    if((+this.Zflag) == 0){
-                        console.log("previous pos: " + this.position);
-                        if((goTo + this.position) >= 256){
-                            this.position = (goTo + this.position) - 256;
-                            console.log("too big " + this.position);
-                        } else {
-                            this.position = goTo + this.position;
-                        }
-                        console.log("go to2: " + goTo + ", position: " + this.position);
+                    if ((+this.Zflag) == 0) {
+                        this.position = ((+this.position) + 2 + TSOS.MemoryAccessor.readMemory((+this.position)+1)) % TSOS.MemoryManager.endProgram;
+                    } else {
+                        this.position += 2;
                     }
-                    this.position += 1;
+                    this.PC = this.position;
+                    console.log("Z Pos: " + this.position);
                     break;
 
                 //EE - increment the value of a byte, 2 args
@@ -259,7 +250,8 @@ module TSOS {
                     var stringBuilder = "";
                     console.log("FF: " + this.Xreg);
                     if((+this.Xreg) == 1){
-                        _StdOut.putText(this.Yreg);
+                        console.log("FF y reg: " + this.Yreg);
+                        _StdOut.putText(this.Yreg.toString());
                     } else if ((+this.Xreg) == 2) {
                         var stringBuilder = "";
                         //Grab the current Y Register value
@@ -288,6 +280,8 @@ module TSOS {
         }
 
         //function to convert string to hex
+        //did not realize this was already built in cause I'm dumb
+        //leaving it anyway cause I took the time to make it
         public convertHex(hex: string): number {
             var add = 0;
             console.log("Var: " + hex + ", 2: " + hex[2] + " 3: " + hex[3]);
