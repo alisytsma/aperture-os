@@ -1,6 +1,6 @@
 ///<reference path="../globals.ts" />
 /* ------------
-     CPU.ts
+     CPU.tss
 
      Requires global.ts.
 
@@ -198,39 +198,11 @@ var TSOS;
                     break;
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
-                    /*this.IR = "D0";
-                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
-                    arg = this.convertHex(addr);
-                    var goTo = (this.convertHex(arg));
-                    console.log("go to1: " + goTo + ", position: " + this.position + ", add: " + (this.position + goTo));
-                    if((+this.Zflag) == 0){
-                        console.log("previous pos: " + this.position);
-                        if((goTo + this.position) >= 256){
-                            this.position = (goTo + this.position) - 256;
-                            console.log("too big " + this.position);
-                        } else {
-                            this.position = goTo + this.position;
-                        }
-                        console.log("go to2: " + goTo + ", position: " + this.position);
-                    }
-                    this.position += 1;
-                    // get the branch value from memory
-                    var branch = TSOS.MemoryAccessor.readMemory(this.PC + 1);
-                    var branchAddress = parseInt(branch, 16) + this.PC;
-                    // console.log(`PC > ${this.PC}`, ` Branch > ${branchAddress}`);
-                    // if the branch will exceed the memory, go back to 0
-                    if (branchAddress > TSOS.MemoryManager.endProgram - 1) {
-                        branchAddress = branchAddress % 256;
-                    }
-                    // Add 2 to account for the branch op and the location
-                    this.PC = branchAddress + 2;*/
+                    //if zflag is 0
                     if ((+this.Zflag) == 0) {
-                        this.PC = (this.position + 2 + TSOS.MemoryAccessor.readMemory(+(this.position) + 1)) % TSOS.MemoryManager.endProgram;
+                        this.position = ((2 + parseInt((TSOS.MemoryAccessor.readMemory(this.position + 1)), 16)) % (+TSOS.MemoryManager.endProgram));
                     }
-                    else {
-                        this.PC += 2;
-                    }
-                    this.position = this.PC;
+                    this.PC = this.position;
                     console.log("Z Pos: " + this.position);
                     break;
                 //EE - increment the value of a byte, 2 args

@@ -1,7 +1,7 @@
 ///<reference path="../globals.ts" />
 
 /* ------------
-     CPU.ts
+     CPU.tss
 
      Requires global.ts.
 
@@ -219,10 +219,9 @@ module TSOS {
 
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
+                    //if zflag is 0
                     if ((+this.Zflag) == 0) {
-                        this.position = ((+this.position) + 2 + TSOS.MemoryAccessor.readMemory((+this.position)+1)) % TSOS.MemoryManager.endProgram;
-                    } else {
-                        this.position += 2;
+                        this.position = ((2 + parseInt((TSOS.MemoryAccessor.readMemory(this.position + 1)), 16)) % (+TSOS.MemoryManager.endProgram));
                     }
                     this.PC = this.position;
                     console.log("Z Pos: " + this.position);
