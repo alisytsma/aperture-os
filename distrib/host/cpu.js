@@ -53,7 +53,7 @@ var TSOS;
             //console.log("Process: " + _Kernel.readyQueue[this.runningPID]);
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.program.PC, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
             // console.log("Memory: " + _Memory.memArray);
-            console.log("Location: " + this.positionCol + "," + this.positionRow);
+            // console.log("Location: " + this.positionCol + "," + this.positionRow);
             _CPU.opCodes(_Memory.memArray[this.positionCol][this.positionRow], this.positionCol, this.positionRow, this.program.processId, this.program.status);
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             if (this.positionRow < 7) {
@@ -84,7 +84,7 @@ var TSOS;
                     }
                     else {
                         row = 0;
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = _Memory.memArray[column + 1][row];
                     }
                     this.Acc = arg;
                     this.program.Acc = arg;
@@ -96,17 +96,25 @@ var TSOS;
                     }
                     else {
                         row = 0;
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = _Memory.memArray[column + 1][row];
                     }
                     var indexCol = Math.ceil(this.convertHex(arg) / 8);
                     var indexRow = this.convertHex(arg) % 8;
                     this.Acc = _Memory.memArray[indexCol - 1][indexRow];
-                    console.log("Coord: " + (indexCol - 1) + ", " + (indexRow));
-                    console.log("Result: " + _Memory.memArray[indexCol][indexRow]);
                     break;
                 //8D - store acc in mem, 2 arg
                 case "8D":
-                    console.log("Code 8D");
+                    if (row < 7) {
+                        arg = _Memory.memArray[column][row + 1];
+                    }
+                    else {
+                        row = 0;
+                        arg = _Memory.memArray[column + 1][row];
+                    }
+                    var indexCol = Math.ceil(this.convertHex(arg) / 8);
+                    var indexRow = this.convertHex(arg) % 8;
+                    console.log("Location: " + (indexCol - 1) + ", " + indexRow);
+                    _Memory.memArray[indexCol - 1][indexRow] = this.Acc;
                     break;
                 case "6D":
                     console.log("Code 6D");
@@ -154,6 +162,9 @@ var TSOS;
                     break;
             }
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.clearTable();
+            TSOS.Control.loadTable();
             //6D - add with carry, 2 arg
             //A2 - load x reg with constant, 1 arg
             //AE - load x reg from mem, 2 arg
@@ -166,9 +177,11 @@ var TSOS;
             //EE - increment the value of a byte, 2 args
             //FF - system call
         };
+        //function to convert string to hex
         Cpu.prototype.convertHex = function (hex) {
             var add = 0;
-            console.log("hex 0: " + hex[0]);
+            //get first number, if letter translate then multiply by 16
+            //otherwise just multiply by 16
             switch (hex[0]) {
                 case "A":
                     add = 10 * 16;
@@ -188,12 +201,37 @@ var TSOS;
                 case "F":
                     add = 15 * 16;
                     break;
+                default:
+                    add = (+hex[0]) * 16;
+                    break;
             }
-            if (add != 0)
-                add += (+hex[1]);
-            else
-                add = (+hex);
+            //get second number, if letter translate then add to first number
+            //otherwise just add to first number
+            switch (hex[1]) {
+                case "A":
+                    add += 10;
+                    break;
+                case "B":
+                    add += 11;
+                    break;
+                case "C":
+                    add += 12;
+                    break;
+                case "D":
+                    add += 13;
+                    break;
+                case "E":
+                    add += 14;
+                    break;
+                case "F":
+                    add += 15;
+                    break;
+                default:
+                    add += (+hex[1]);
+                    break;
+            }
             console.log("Hex: " + add);
+            //return hex number
             return add;
         };
         return Cpu;
