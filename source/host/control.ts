@@ -182,15 +182,16 @@ module TSOS {
                     var td = tr.insertCell();
                     //if first in column
                     if(j == 0) {
+                        var hexNum = memNum.toString(16).toUpperCase();
                         //if single digit, add 0x00 in front
-                        if(memNum < 10)
-                            td.appendChild(document.createTextNode("0x00" + memNum));
+                        if(hexNum.length == 1)
+                            td.appendChild(document.createTextNode("0x00" + hexNum));
                         //if two digits, add 0x0 in front
-                        else if(memNum < 100)
-                            td.appendChild(document.createTextNode("0x0" + memNum));
+                        else if(hexNum.length == 2)
+                            td.appendChild(document.createTextNode("0x0" + hexNum));
                         //if three digits, add 0x in front
                         else
-                            td.appendChild(document.createTextNode("0x" + memNum));
+                            td.appendChild(document.createTextNode("0x" + hexNum));
                     }
                     //if not first in column
                     else {

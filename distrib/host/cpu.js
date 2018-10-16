@@ -177,12 +177,16 @@ var TSOS;
                     this.IR = "EC";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    console.log("Mem add: " + addr);
                     arg = this.convertHex(addr);
+                    console.log("Conv: " + arg);
                     //get xreg value
                     var xValue = (+this.Xreg);
+                    console.log("XVal: " + this.Xreg);
                     //find address corresponding to user input and add it to acc value
                     var memVal;
                     memVal = TSOS.MemoryAccessor.readMemory(+arg);
+                    console.log("Mem Val: " + memVal);
                     if (xValue == memVal) {
                         this.Zflag = "1";
                     }
@@ -217,7 +221,8 @@ var TSOS;
                     this.IR = "EE";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
-                    arg = this.convertHex(addr); //add 1 to position in mem
+                    arg = this.convertHex(addr);
+                    //add 1 to position in mem
                     var memVal = (+TSOS.MemoryAccessor.readMemory(+arg)) + 1;
                     TSOS.MemoryAccessor.writeMemory((+arg), memVal.toString());
                     //make sure valid number
@@ -228,13 +233,29 @@ var TSOS;
                 //FF - system call
                 case "FF":
                     this.IR = "FF";
+                    var stringBuilder = "";
+                    console.log("FF: " + this.Xreg);
                     if ((+this.Xreg) == 1) {
                         _StdOut.putText(this.Yreg);
                     }
                     else if ((+this.Xreg) == 2) {
                         var stringBuilder = "";
-                        arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
-                        String.fromCharCode();
+                        //Grab the current Y Register value
+                        var yRegVal = (+this.Yreg);
+                        //Go to this spot in the memory
+                        var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
+                        //Loop until we reach "00"
+                        while (byte != "00") {
+                            //Go to this spot in the memory
+                            var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
+                            //Get the char code from this spot's value
+                            var char = String.fromCharCode(byte);
+                            yRegVal++;
+                            //add char to string
+                            stringBuilder += char;
+                        }
+                        //print string
+                        _StdOut.putText(stringBuilder);
                     }
                     break;
             }
