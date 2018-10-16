@@ -68,9 +68,10 @@ var TSOS;
         Control.hostBtnStartOS_click = function (btn) {
             // Disable the (passed-in) start button...
             btn.disabled = true;
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and single step buttons ...
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
+            document.getElementById("btnStepEna").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             //_ProcessControlBlock = new ProcessControlBlock(0,0,0,0,0,0,0,0);  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
@@ -103,6 +104,29 @@ var TSOS;
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        };
+        //enable/disable step mode
+        Control.hostBtnStepEna_click = function (btn) {
+            if (_CPU.singleStep == false) {
+                _CPU.singleStep = true;
+                document.getElementById("btnStep").disabled = false;
+                document.getElementById("btnStepEna").value = "Disable Single Step Mode";
+            }
+            else {
+                _CPU.singleStep = false;
+                document.getElementById("btnStep").disabled = true;
+                document.getElementById("btnStepEna").value = "Enable Single Step Mode";
+            }
+        };
+        //disable step mode
+        Control.disableSingleStep = function () {
+            _CPU.singleStep = false;
+            document.getElementById("btnStep").disabled = true;
+            document.getElementById("btnStepEna").value = "Enable Single Step Mode";
+        };
+        //step button
+        Control.hostBtnStep_click = function (btn) {
+            _CPU.cycle();
         };
         //function to clear the memory table
         Control.clearTable = function () {
@@ -141,16 +165,9 @@ var TSOS;
                     //if not first in column
                     else {
                         //add memory value to cell
-                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayCountColumn][_Memory.memArrayCountRow]));
+                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayPosition]));
                         //if not at the end of the row, increment row count
-                        if (_Memory.memArrayCountRow < 7) {
-                            _Memory.memArrayCountRow++;
-                            //if at the end of the row, set row count to 0 and go to the next column
-                        }
-                        else {
-                            _Memory.memArrayCountRow = 0;
-                            _Memory.memArrayCountColumn++;
-                        }
+                        _Memory.memArrayPosition++;
                     }
                 }
                 //increment column header by 8
@@ -162,8 +179,7 @@ var TSOS;
             document.getElementById("tableMemory").style.height = '100px';
             document.getElementById("tableMemory").style.overflow = 'auto';
             //reset counters to 0
-            _Memory.memArrayCountColumn = 0;
-            _Memory.memArrayCountRow = 0;
+            _Memory.memArrayPosition = 0;
         };
         Control.updatePCB = function (pid, status, pc, acc, ir, xreg, yreg, zflag) {
             document.getElementById("pcbPID").innerHTML = pid;

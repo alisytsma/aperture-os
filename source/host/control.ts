@@ -83,9 +83,10 @@ module TSOS {
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt, Reset, and single step buttons ...
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("btnStepEna")).disabled = false;
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -128,6 +129,33 @@ module TSOS {
             // page from its cache, which is not what we want.
         }
 
+        //enable/disable step mode
+        public static hostBtnStepEna_click(btn): void {
+            if(_CPU.singleStep == false) {
+                _CPU.singleStep = true;
+                (<HTMLInputElement> document.getElementById("btnStep")).disabled = false;
+                (<HTMLInputElement> document.getElementById("btnStepEna")).value = "Disable Single Step Mode";
+            } else {
+                _CPU.singleStep = false;
+                (<HTMLInputElement> document.getElementById("btnStep")).disabled = true;
+                (<HTMLInputElement> document.getElementById("btnStepEna")).value = "Enable Single Step Mode";
+
+            }
+        }
+
+        //disable step mode
+        public static disableSingleStep(): void {
+            _CPU.singleStep = false;
+            (<HTMLInputElement> document.getElementById("btnStep")).disabled = true;
+            (<HTMLInputElement> document.getElementById("btnStepEna")).value = "Enable Single Step Mode";
+
+        }
+
+        //step button
+        public static hostBtnStep_click(btn): void {
+            _CPU.cycle();
+        }
+
         //function to clear the memory table
         public static clearTable():void {
             var tableDiv = document.getElementById("divMemory");
@@ -167,16 +195,10 @@ module TSOS {
                     //if not first in column
                     else {
                         //add memory value to cell
-                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayCountColumn][_Memory.memArrayCountRow]));
+                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayPosition]));
 
                         //if not at the end of the row, increment row count
-                        if(_Memory.memArrayCountRow < 7) {
-                            _Memory.memArrayCountRow++;
-                        //if at the end of the row, set row count to 0 and go to the next column
-                        } else {
-                            _Memory.memArrayCountRow = 0;
-                            _Memory.memArrayCountColumn++;
-                        }
+                        _Memory.memArrayPosition++;
                     }
                 }
                 //increment column header by 8
@@ -188,8 +210,7 @@ module TSOS {
             document.getElementById("tableMemory").style.height = '100px';
             document.getElementById("tableMemory").style.overflow = 'auto';
             //reset counters to 0
-            _Memory.memArrayCountColumn = 0;
-            _Memory.memArrayCountRow = 0;
+            _Memory.memArrayPosition = 0;
         }
 
         public static updatePCB(pid: string, status: string, pc: string, acc: string, ir: string, xreg: string, yreg: string, zflag: string): void {
@@ -211,5 +232,5 @@ module TSOS {
             document.getElementById("Yreg").innerHTML = Yreg;
             document.getElementById("Zflag").innerHTML = Zflag;
         }
-    }
+
 }

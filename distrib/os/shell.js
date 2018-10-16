@@ -413,7 +413,8 @@ var TSOS;
             console.log("PID: " + _OsShell.pidCount);
             if (_OsShell.pidCount == args) {
                 _CPU.runningPID = args;
-                _CPU.isExecuting = true;
+                if (_CPU.singleStep == false)
+                    _CPU.isExecuting = true;
             }
             else {
                 _StdOut.putText("Not a valid PID");

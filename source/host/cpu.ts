@@ -21,8 +21,8 @@ module TSOS {
 
         public runningPID: number;
         public program;
-        public positionRow = 0;
-        public positionCol = 0;
+        public position = 0;
+        public singleStep = false;
 
         constructor(public PC: number = 0,
                     public Acc: string = "0",
@@ -48,25 +48,21 @@ module TSOS {
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
+            console.log("Position: " + this.position);
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            console.log(this.runningPID);
             this.program = _Kernel.readyQueue[this.runningPID];
             //update status to running
             this.program.status = "Running";
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
 
             //send input to opCodes to check what actions need to be performed
-            _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.positionCol,this.positionRow), this.positionCol, this.positionRow, this.program.processId, this.program.status);
+            _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.position));
+            this.position++;
+
             //update PCB
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            if(this.positionRow < 7) {
-                this.positionRow++;
-            } else {
-                this.positionRow = 0;
-                this.positionCol++;
-            // if at end of memory, terminate
-            } if(this.positionRow >= 7 && this.positionCol >= 31){
+            if(this.position >= TSOS.MemoryAccessor.memoryLength()){
                 this.terminateOS();
             }
         }
@@ -77,237 +73,136 @@ module TSOS {
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             //mark isExecuting as false
             this.isExecuting = false;
+            //mark single step as false
+            TSOS.Control.disableSingleStep();
             //set memory back to 0
-            for(var i = 0; i < 32; i++){
-                for(var j = 0; j < 8; j++){
-                    _Memory.memArray[i][j] = "00";
-                }
-            }
+            TSOS.MemoryAccessor.clearMem();
             //reset table
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
         }
 
 
-        public opCodes(input: string, column: number, row: number, pid: string, status: string): void {
+        public opCodes(input: string): void {
+            var addr;
             var arg;
 
             switch(input){
                 //A9 - load acc with const, 1 arg
                 case "A9":
                     this.IR = "A9";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = _Memory.memArray[column][row + 1];
-                    //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = _Memory.memArray[column + 1][row];
-                    }
-                    //set acc to user input
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
+                    //find next code to get values for op code
                     this.Acc = arg;
-                    this.PC += 2;
+                    this.position ++;
                     break;
 
                 //AD - load from mem, 2 arg
                 case "AD":
                     this.IR = "AD";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                    //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set the acc value to this position in memory
-                    this.Acc = TSOS.MemoryAccessor.readMemory(indexCol - 1, row);;
-
-                    this.PC += 3;
+                    this.Acc = TSOS.MemoryAccessor.readMemory(+arg);
+                    this.position += 2;
                     break;
 
                 //8D - store acc in mem, 2 arg
                 case "8D":
                     this.IR = "8D";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set this position in memory equal to the acc value
-                    console.log("Col: " + (indexCol) + ", Row: " + indexRow);
-                    TSOS.MemoryAccessor.writeMemory(indexCol, indexRow + 1, this.Acc.toString());
-                    this.PC += 3;
+                    TSOS.MemoryAccessor.writeMemory((+arg), this.Acc);
+                    this.position += 2;
                     break;
 
                 //6D - add with carry, 2 arg
                 case "6D":
                     this.IR = "6D";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //get acc value
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);                    //get acc value
                     var accValue = (+this.Acc);
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
+                    console.log("Acc Val: " + accValue + ", add: " + arg);
                     //find address corresponding to user input and add it to acc value
-                    accValue += (+_Memory.memArray[indexCol - 1][indexRow]);
+                    accValue += (+arg);
+                    console.log("New acc Val: " + accValue);
+
                     //make sure valid input
                     if(!isNaN(accValue))
                         this.Acc = accValue.toString();
-                    this.PC += 3;
+                    this.position += 2;
                     break;
 
                 //A2 - load x reg with constant, 1 arg
                 case "A2":
                     this.IR = "A2";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set xreg to user input
                     this.Xreg = arg;
-                    this.PC += 2;
+                    this.position += 1;
                     break;
 
                 //AE - load x reg from mem, 2 arg
                 case "AE":
                     this.IR = "AE";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set the xreg value to this position in memory
-                    this.Xreg = _Memory.memArray[indexCol - 1][indexRow];
-                    this.PC += 3;
+                    this.Xreg = TSOS.MemoryAccessor.readMemory(+arg);
+                    this.position += 2;
                     break;
 
                 //A0 - load y reg with const, 1 arg
                 case "A0":
                     this.IR = "A0";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set yreg to user input
                     this.Yreg = arg;
-                    this.PC += 2;
+                    this.position += 1;
                     break;
 
                 //AC - load y reg from mem. 2 arg
                 case "AC":
                     this.IR = "AC";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //set the yreg value to this position in memory
-                    this.Yreg = _Memory.memArray[indexCol - 1][indexRow];
-                    this.PC += 3;
+                    this.Yreg = TSOS.MemoryAccessor.readMemory(+arg);
+                    this.position += 2;
                     break;
 
                 //EA - no op, 0 arg
                 case "EA":
                     this.IR = "EA";
-                    this.PC += 1;
                     break;
 
                 //00 - break, 0 arg but check for another
                 case "00":
                     this.IR = "00";
-                    var arg2;
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                    //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    } //if not at end of row, increment row
-                    if(row < 7) {
-                        arg2 = TSOS.MemoryAccessor.readMemory(column, row + 2);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg2 = TSOS.MemoryAccessor.readMemory(column + 1, row + 1);
-                    }
-                    //if next input is also 00, terminate
-                    if(arg == "00" && arg2 == "00"){
-                        this.PC += 2;
-                        this.terminateOS();
-                        break;
-                    } else {
-                        this.PC += 1;
-                    }
+                    this.terminateOS();
                     break;
 
                 //EC - compare a byte in mem to the x reg, 2 arg
                 case "EC":
                     this.IR = "EC";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
                     //get xreg value
                     var xValue = (+this.Xreg);
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
-                    console.log("index row: " + indexRow + "; indexCol: " + indexCol);
 
                     //find address corresponding to user input and add it to acc value
                     var memVal;
-                    if(indexCol > 0)
-                        memVal = (+_Memory.memArray[indexCol - 1][indexRow]);
-                    else
-                        memVal = (+_Memory.memArray[0][indexRow]);
+                    memVal = TSOS.MemoryAccessor.readMemory(+arg);
 
                     if(xValue == memVal){
                         this.Zflag = "1";
@@ -315,64 +210,42 @@ module TSOS {
                         this.Zflag = "0";
                     }
                     this.Xreg = xValue.toString();
-                    this.PC += 3;
+                    this.position += 2;
                     break;
 
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
                     this.IR = "D0";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    var incr = (+arg);
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);
+                    var goTo = (this.convertHex(arg));
+                    console.log("go to1: " + goTo + ", position: " + this.position + ", add: " + (this.position + goTo));
                     if((+this.Zflag) == 0){
-                        console.log("previous pos: " + this.positionCol + ", " + this.positionRow);
-                        if(row < 7){
-                            this.positionRow += incr;
+                        console.log("previous pos: " + this.position);
+                        if((goTo + this.position) >= 256){
+                            this.position = (goTo + this.position) - 256;
+                            console.log("too big " + this.position);
                         } else {
-                            this.positionRow += (incr - 1);
-                            this.positionCol += 1;
+                            this.position = goTo + this.position;
                         }
-                        console.log("after pos: " + this.positionCol + ", " + this.positionRow);
+                        console.log("go to2: " + goTo + ", position: " + this.position);
                     }
-                    this.PC += incr;
+                    this.position += 1;
                     break;
 
                 //EE - increment the value of a byte, 2 args
                 case "EE":
                     this.IR = "EE";
-                    //if not at end of row, increment row
-                    if(row < 7) {
-                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
-                        //else go to beginning of next line
-                    } else {
-                        row = 0;
-                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
-                    }
-                    //set column to rounded up converted decimal input divided by 8
-                    var indexCol = Math.ceil(this.convertHex(arg)/8);
-                    //set row to the remainder of the converted decimal input divided by 8
-                    var indexRow = this.convertHex(arg) % 8;
-                    //find address corresponding to user input and increment it
-                    var memVal
-                    if(indexCol > 0)
-                        memVal = (+TSOS.MemoryAccessor.readMemory(indexCol - 1, indexRow)) + 1;
-                    else
-                        memVal = (+TSOS.MemoryAccessor.readMemory(0, indexRow)) + 1;
-                    if(indexCol > 0)
-                        TSOS.MemoryAccessor.writeMemory(indexCol - 1, indexRow, memVal.toString());
-                    else
-                        TSOS.MemoryAccessor.writeMemory(0, indexRow, memVal.toString());
+                    //find next 2 codes and swap them to get values for op code
+                    addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
+                    arg = this.convertHex(addr);                    //add 1 to position in mem
+                    var memVal = (+TSOS.MemoryAccessor.readMemory(+arg)) + 1;
+                    TSOS.MemoryAccessor.writeMemory((+arg), memVal.toString());
 
                     //make sure valid number
                     if(!isNaN(accValue))
                         this.Acc = accValue.toString();
-                    this.PC += 3;
+                    this.position += 2;
                     break;
 
                 //FF - system call
@@ -381,69 +254,124 @@ module TSOS {
                     if((+this.Xreg) == 1){
                         _StdOut.putText(this.Yreg);
                     } else if ((+this.Xreg) == 2){
-
+                        var stringBuilder = "";
+                        arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
+                        String.fromCharCode();
                     }
-                    this.PC += 2;
                     break;
             }
+            this.PC = this.position;
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            TSOS.Control.clearTable();
-            TSOS.Control.loadTable();
         }
 
         //function to convert string to hex
         public convertHex(hex: string): number {
             var add = 0;
-            //get first number, if letter translate then multiply by 16
-            //otherwise just multiply by 16
-            switch(hex[0]) {
-                case "A":
-                    add = 10 * 16;
-                    break;
-                case "B":
-                    add = 11 * 16;
-                    break;
-                case "C":
-                    add = 12 * 16;
-                    break;
-                case "D":
-                    add = 13 * 16;
-                    break;
-                case "E":
-                    add = 14 * 16;
-                    break;
-                case "F":
-                    add = 15 * 16;
-                    break;
-                default:
-                    add = (+hex[0]) * 16;
-                    break;
-            }
-            //get second number, if letter translate then add to first number
-            //otherwise just add to first number
-            switch(hex[1]) {
-                case "A":
-                    add += 10;
-                    break;
-                case "B":
-                    add += 11;
-                    break;
-                case "C":
-                    add += 12;
-                    break;
-                case "D":
-                    add += 13;
-                    break;
-                case "E":
-                    add += 14;
-                    break;
-                case "F":
-                    add += 15;
-                    break;
-                default:
-                    add += (+hex[1]);
-                    break;
+            console.log("Var: " + hex + ", 2: " + hex[2] + " 3: " + hex[3]);
+
+            if(hex.length == 4) {
+                //get first number, if letter translate then multiply by 16
+                //otherwise just multiply by 16
+                switch (hex[2]) {
+                    case "A":
+                        add = 10 * 16;
+                        break;
+                    case "B":
+                        add = 11 * 16;
+                        break;
+                    case "C":
+                        add = 12 * 16;
+                        break;
+                    case "D":
+                        add = 13 * 16;
+                        break;
+                    case "E":
+                        add = 14 * 16;
+                        break;
+                    case "F":
+                        add = 15 * 16;
+                        break;
+                    default:
+                        add = (+hex[2]) * 16;
+                        break;
+                }
+                //get second number, if letter translate then add to first number
+                //otherwise just add to first number
+                switch (hex[3]) {
+                    case "A":
+                        add += 10;
+                        break;
+                    case "B":
+                        add += 11;
+                        break;
+                    case "C":
+                        add += 12;
+                        break;
+                    case "D":
+                        add += 13;
+                        break;
+                    case "E":
+                        add += 14;
+                        break;
+                    case "F":
+                        add += 15;
+                        break;
+                    default:
+                        add += (+hex[3]);
+                        break;
+                }
+            } else if (hex.length == 2){
+                //get first number, if letter translate then multiply by 16
+                //otherwise just multiply by 16
+                switch (hex[0]) {
+                    case "A":
+                        add = 10 * 16;
+                        break;
+                    case "B":
+                        add = 11 * 16;
+                        break;
+                    case "C":
+                        add = 12 * 16;
+                        break;
+                    case "D":
+                        add = 13 * 16;
+                        break;
+                    case "E":
+                        add = 14 * 16;
+                        break;
+                    case "F":
+                        add = 15 * 16;
+                        break;
+                    default:
+                        add = (+hex[0]) * 16;
+                        break;
+                }
+                //get second number, if letter translate then add to first number
+                //otherwise just add to first number
+                switch (hex[1]) {
+                    case "A":
+                        add += 10;
+                        break;
+                    case "B":
+                        add += 11;
+                        break;
+                    case "C":
+                        add += 12;
+                        break;
+                    case "D":
+                        add += 13;
+                        break;
+                    case "E":
+                        add += 14;
+                        break;
+                    case "F":
+                        add += 15;
+                        break;
+                    default:
+                        add += (+hex[1]);
+                        break;
+                }
             }
             console.log("Hex: " + add);
             //return hex number
