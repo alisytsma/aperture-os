@@ -140,7 +140,6 @@ var TSOS;
             var newProc = new TSOS.ProcessControlBlock(pid);
             this.readyQueue.push(newProc);
             newProc.init();
-            _OsShell.pidCount += 1;
         };
         //
         // OS Utility Routines

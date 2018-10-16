@@ -23,7 +23,7 @@ module TSOS {
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
         public status = "Ready";
-        public pidCount = 0;
+        public pidCount = -1;
 
 
         constructor() {
@@ -467,6 +467,7 @@ module TSOS {
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if(valid) {
+                _OsShell.pidCount++;
                 _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                 TSOS.MemoryManager.updateMemory(input.toString());
                 _Kernel.createProcess(_OsShell.pidCount);
@@ -480,8 +481,13 @@ module TSOS {
 
         //run a program
         public run(args){
-            _CPU.runningPID = args;
-            _CPU.isExecuting = true;
+            console.log("PID: " + _OsShell.pidCount);
+            if(_OsShell.pidCount == args) {
+                _CPU.runningPID = args;
+                _CPU.isExecuting = true;
+            } else {
+                _StdOut.putText("Not a valid PID");
+            }
         }
     }
 }

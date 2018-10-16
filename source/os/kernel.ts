@@ -164,7 +164,6 @@ module TSOS {
             var newProc = new ProcessControlBlock(pid);
             this.readyQueue.push(newProc);
             newProc.init();
-            _OsShell.pidCount += 1;
         }
 
 

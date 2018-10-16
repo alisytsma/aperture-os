@@ -21,7 +21,7 @@ var TSOS;
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
             this.status = "Ready";
-            this.pidCount = 0;
+            this.pidCount = -1;
         }
         Shell.prototype.init = function () {
             var sc;
@@ -398,6 +398,7 @@ var TSOS;
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if (valid) {
+                _OsShell.pidCount++;
                 _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                 TSOS.MemoryManager.updateMemory(input.toString());
                 _Kernel.createProcess(_OsShell.pidCount);
@@ -409,8 +410,14 @@ var TSOS;
         };
         //run a program
         Shell.prototype.run = function (args) {
-            _CPU.runningPID = args;
-            _CPU.isExecuting = true;
+            console.log("PID: " + _OsShell.pidCount);
+            if (_OsShell.pidCount == args) {
+                _CPU.runningPID = args;
+                _CPU.isExecuting = true;
+            }
+            else {
+                _StdOut.putText("Not a valid PID");
+            }
         };
         return Shell;
     }());

@@ -42,7 +42,7 @@ var TSOS;
             this.Yreg = "0";
             this.Zflag = "0";
             this.isExecuting = false;
-            TSOS.Control.updateCPU(this.PC.toString(), this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
@@ -142,7 +142,8 @@ var TSOS;
                     //set row to the remainder of the converted decimal input divided by 8
                     var indexRow = this.convertHex(arg) % 8;
                     //set this position in memory equal to the acc value
-                    TSOS.MemoryAccessor.writeMemory(indexCol - 1, indexRow + 1, this.Acc);
+                    console.log("Col: " + (indexCol) + ", Row: " + indexRow);
+                    TSOS.MemoryAccessor.writeMemory(indexCol, indexRow + 1, this.Acc.toString());
                     this.PC += 3;
                     break;
                 //6D - add with carry, 2 arg
@@ -250,6 +251,7 @@ var TSOS;
                 //00 - break, 0 arg but check for another
                 case "00":
                     this.IR = "00";
+                    var arg2;
                     //if not at end of row, increment row
                     if (row < 7) {
                         arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
@@ -258,13 +260,24 @@ var TSOS;
                     else {
                         row = 0;
                         arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    } //if not at end of row, increment row
+                    if (row < 7) {
+                        arg2 = TSOS.MemoryAccessor.readMemory(column, row + 2);
+                        //else go to beginning of next line
+                    }
+                    else {
+                        row = 0;
+                        arg2 = TSOS.MemoryAccessor.readMemory(column + 1, row + 1);
                     }
                     //if next input is also 00, terminate
-                    if (arg == "00") {
+                    if (arg == "00" && arg2 == "00") {
+                        this.PC += 2;
                         this.terminateOS();
                         break;
                     }
-                    this.PC += 2;
+                    else {
+                        this.PC += 1;
+                    }
                     break;
                 //EC - compare a byte in mem to the x reg, 2 arg
                 case "EC":
@@ -303,9 +316,28 @@ var TSOS;
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
                     this.IR = "D0";
-                    if ((+this.Zflag) == 0) {
+                    //if not at end of row, increment row
+                    if (row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
                     }
-                    this.PC += 1;
+                    else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    var incr = (+arg);
+                    if ((+this.Zflag) == 0) {
+                        console.log("previous pos: " + this.positionCol + ", " + this.positionRow);
+                        if (row < 7) {
+                            this.positionRow += incr;
+                        }
+                        else {
+                            this.positionRow += (incr - 1);
+                            this.positionCol += 1;
+                        }
+                        console.log("after pos: " + this.positionCol + ", " + this.positionRow);
+                    }
+                    this.PC += incr;
                     break;
                 //EE - increment the value of a byte, 2 args
                 case "EE":
@@ -342,7 +374,7 @@ var TSOS;
                 case "FF":
                     this.IR = "FF";
                     if ((+this.Xreg) == 1) {
-                        _StdOut.putText("Y register: " + this.Yreg);
+                        _StdOut.putText(this.Yreg);
                     }
                     else if ((+this.Xreg) == 2) {
                     }
