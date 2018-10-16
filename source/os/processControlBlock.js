@@ -18,7 +18,7 @@ var TSOS;
     var ProcessControlBlock = /** @class */ (function () {
         function ProcessControlBlock(processId, status, PC, Acc, IR, Xreg, Yreg, Zflag) {
             if (status === void 0) { status = "Ready"; }
-            if (PC === void 0) { PC = "0"; }
+            if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = "0"; }
             if (IR === void 0) { IR = "0"; }
             if (Xreg === void 0) { Xreg = "0"; }
@@ -35,7 +35,7 @@ var TSOS;
         }
         ProcessControlBlock.prototype.init = function () {
             this.status = "Ready";
-            this.PC = "0";
+            this.PC = 0;
             this.Acc = "0";
             this.IR = "0";
             this.Xreg = "0";

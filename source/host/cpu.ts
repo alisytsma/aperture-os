@@ -24,7 +24,7 @@ module TSOS {
         public positionRow = 0;
         public positionCol = 0;
 
-        constructor(public PC: string = "0",
+        constructor(public PC: number = 0,
                     public Acc: string = "0",
                     public IR: string = "0",
                     public Xreg: string = "0",
@@ -34,7 +34,7 @@ module TSOS {
         }
 
         public init(): void {
-            this.PC = "0";
+            this.PC = 0;
             this.Acc = "0";
             this.IR = "0";
             this.Xreg = "0";
@@ -42,7 +42,7 @@ module TSOS {
             this.Zflag = "0";
             this.isExecuting = false;
 
-            TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updateCPU(this.PC.toString(), this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
 
         }
 
@@ -50,138 +50,319 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-
+            console.log(this.runningPID);
             this.program = _Kernel.readyQueue[this.runningPID];
+            //update status to running
             this.program.status = "Running";
-            //console.log("Process: " + _Kernel.readyQueue[this.runningPID]);
-            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.program.PC, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
-           // console.log("Memory: " + _Memory.memArray);
+            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
 
-           // console.log("Location: " + this.positionCol + "," + this.positionRow);
-            _CPU.opCodes(_Memory.memArray[this.positionCol][this.positionRow], this.positionCol, this.positionRow, this.program.processId, this.program.status);
-
+            //send input to opCodes to check what actions need to be performed
+            _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.positionCol,this.positionRow), this.positionCol, this.positionRow, this.program.processId, this.program.status);
+            //update PCB
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             if(this.positionRow < 7) {
                 this.positionRow++;
             } else {
                 this.positionRow = 0;
                 this.positionCol++;
+            // if at end of memory, terminate
             } if(this.positionRow >= 7 && this.positionCol >= 31){
                 this.terminateOS();
             }
         }
 
         public terminateOS(): void {
+            //set status to terminated and update block
             this.program.status = "Terminated";
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            //mark isExecuting as false
             this.isExecuting = false;
-            console.log("Terminate");
+            //set memory back to 0
+            for(var i = 0; i < 32; i++){
+                for(var j = 0; j < 8; j++){
+                    _Memory.memArray[i][j] = "00";
+                }
+            }
+            //reset table
+            TSOS.Control.clearTable();
+            TSOS.Control.loadTable();
         }
 
 
         public opCodes(input: string, column: number, row: number, pid: string, status: string): void {
-           // console.log("Case: " + input);
             var arg;
 
             switch(input){
                 //A9 - load acc with const, 1 arg
                 case "A9":
+                    this.IR = "A9";
+                    //if not at end of row, increment row
                     if(row < 7) {
                         arg = _Memory.memArray[column][row + 1];
+                    //else go to beginning of next line
                     } else {
                         row = 0;
                         arg = _Memory.memArray[column + 1][row];
                     }
+                    //set acc to user input
                     this.Acc = arg;
-                    this.program.Acc = arg;
+                    this.PC += 2;
                     break;
+
                 //AD - load from mem, 2 arg
                 case "AD":
+                    this.IR = "AD";
+                    //if not at end of row, increment row
                     if(row < 7) {
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                    //else go to beginning of next line
                     } else {
                         row = 0;
-                        arg = _Memory.memArray[column + 1][row];
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
                     }
+                    //set column to rounded up converted decimal input divided by 8
                     var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
                     var indexRow = this.convertHex(arg) % 8;
-                    this.Acc = _Memory.memArray[indexCol - 1][indexRow];
+                    //set the acc value to this position in memory
+                    this.Acc = TSOS.MemoryAccessor.readMemory(indexCol - 1, row);;
+
+                    this.PC += 3;
                     break;
 
                 //8D - store acc in mem, 2 arg
                 case "8D":
+                    this.IR = "8D";
+                    //if not at end of row, increment row
                     if(row < 7) {
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
                     } else {
                         row = 0;
-                        arg = _Memory.memArray[column + 1][row];
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
                     }
+                    //set column to rounded up converted decimal input divided by 8
                     var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
                     var indexRow = this.convertHex(arg) % 8;
-                    console.log("Location: " + (indexCol - 1) + ", " + indexRow);
-                    _Memory.memArray[indexCol - 1][indexRow] = this.Acc;
+                    //set this position in memory equal to the acc value
+                    TSOS.MemoryAccessor.writeMemory(indexCol - 1, indexRow + 1, this.Acc);
+                    this.PC += 3;
                     break;
+
+                //6D - add with carry, 2 arg
                 case "6D":
-                    console.log("Code 6D");
-                    break;
-                case "A2":
-                    console.log("Code A2");
-                    break;
-                case "AE":
-                    console.log("Code AE");
-                    break;
-                case "A0":
-                    console.log("Code A0");
-                    break;
-                case "AC":
-                    console.log("Code AC");
-                    break;
-                case "EA":
-                    console.log("Code EA");
-                    break;
-                case "00":
-                    console.log("Code 00");
+                    this.IR = "6D";
+                    //if not at end of row, increment row
                     if(row < 7) {
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
                     } else {
                         row = 0;
-                        arg = _Memory.memArray[column][row + 1];
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
                     }
+                    //get acc value
+                    var accValue = (+this.Acc);
+                    //set column to rounded up converted decimal input divided by 8
+                    var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
+                    var indexRow = this.convertHex(arg) % 8;
+                    //find address corresponding to user input and add it to acc value
+                    accValue += (+_Memory.memArray[indexCol - 1][indexRow]);
+                    //make sure valid input
+                    if(!isNaN(accValue))
+                        this.Acc = accValue.toString();
+                    this.PC += 3;
+                    break;
+
+                //A2 - load x reg with constant, 1 arg
+                case "A2":
+                    this.IR = "A2";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //set xreg to user input
+                    this.Xreg = arg;
+                    this.PC += 2;
+                    break;
+
+                //AE - load x reg from mem, 2 arg
+                case "AE":
+                    this.IR = "AE";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //set column to rounded up converted decimal input divided by 8
+                    var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
+                    var indexRow = this.convertHex(arg) % 8;
+                    //set the xreg value to this position in memory
+                    this.Xreg = _Memory.memArray[indexCol - 1][indexRow];
+                    this.PC += 3;
+                    break;
+
+                //A0 - load y reg with const, 1 arg
+                case "A0":
+                    this.IR = "A0";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //set yreg to user input
+                    this.Yreg = arg;
+                    this.PC += 2;
+                    break;
+
+                //AC - load y reg from mem. 2 arg
+                case "AC":
+                    this.IR = "AC";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //set column to rounded up converted decimal input divided by 8
+                    var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
+                    var indexRow = this.convertHex(arg) % 8;
+                    //set the yreg value to this position in memory
+                    this.Yreg = _Memory.memArray[indexCol - 1][indexRow];
+                    this.PC += 3;
+                    break;
+
+                //EA - no op, 0 arg
+                case "EA":
+                    this.IR = "EA";
+                    this.PC += 1;
+                    break;
+
+                //00 - break, 0 arg but check for another
+                case "00":
+                    this.IR = "00";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                    //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //if next input is also 00, terminate
                     if(arg == "00"){
                         this.terminateOS();
                         break;
                     }
+                    this.PC += 2;
                     break;
+
+                //EC - compare a byte in mem to the x reg, 2 arg
                 case "EC":
-                    console.log("Code EC");
+                    this.IR = "EC";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //get xreg value
+                    var xValue = (+this.Xreg);
+                    //set column to rounded up converted decimal input divided by 8
+                    var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
+                    var indexRow = this.convertHex(arg) % 8;
+                    console.log("index row: " + indexRow + "; indexCol: " + indexCol);
+
+                    //find address corresponding to user input and add it to acc value
+                    var memVal;
+                    if(indexCol > 0)
+                        memVal = (+_Memory.memArray[indexCol - 1][indexRow]);
+                    else
+                        memVal = (+_Memory.memArray[0][indexRow]);
+
+                    if(xValue == memVal){
+                        this.Zflag = "1";
+                    } else {
+                        this.Zflag = "0";
+                    }
+                    this.Xreg = xValue.toString();
+                    this.PC += 3;
                     break;
+
+                //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
-                    console.log("Code D0");
+                    this.IR = "D0";
+                    if((+this.Zflag) == 0){
+
+                    }
+                    this.PC += 1;
                     break;
+
+                //EE - increment the value of a byte, 2 args
                 case "EE":
-                    console.log("Code EE");
+                    this.IR = "EE";
+                    //if not at end of row, increment row
+                    if(row < 7) {
+                        arg = TSOS.MemoryAccessor.readMemory(column, row + 1);
+                        //else go to beginning of next line
+                    } else {
+                        row = 0;
+                        arg = TSOS.MemoryAccessor.readMemory(column + 1, row);
+                    }
+                    //set column to rounded up converted decimal input divided by 8
+                    var indexCol = Math.ceil(this.convertHex(arg)/8);
+                    //set row to the remainder of the converted decimal input divided by 8
+                    var indexRow = this.convertHex(arg) % 8;
+                    //find address corresponding to user input and increment it
+                    var memVal
+                    if(indexCol > 0)
+                        memVal = (+TSOS.MemoryAccessor.readMemory(indexCol - 1, indexRow)) + 1;
+                    else
+                        memVal = (+TSOS.MemoryAccessor.readMemory(0, indexRow)) + 1;
+                    if(indexCol > 0)
+                        TSOS.MemoryAccessor.writeMemory(indexCol - 1, indexRow, memVal.toString());
+                    else
+                        TSOS.MemoryAccessor.writeMemory(0, indexRow, memVal.toString());
+
+                    //make sure valid number
+                    if(!isNaN(accValue))
+                        this.Acc = accValue.toString();
+                    this.PC += 3;
                     break;
+
+                //FF - system call
                 case "FF":
-                    console.log("Code FF");
+                    this.IR = "FF";
+                    if((+this.Xreg) == 1){
+                        _StdOut.putText("Y register: " + this.Yreg);
+                    } else if ((+this.Xreg) == 2){
+
+                    }
+                    this.PC += 2;
                     break;
             }
             TSOS.Control.updateCPU(this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
-
-
-            //6D - add with carry, 2 arg
-            //A2 - load x reg with constant, 1 arg
-            //AE - load x reg from mem, 2 arg
-            //A0 - load y reg with const, 1 arg
-            //AC - load y reg from mem. 2 arg
-            //EA - no op, 0 arg
-            //00 - break, 0 arg
-            //EC - compare a byte in mem to the x reg, 2 arg
-            //D0 - branch n bytes if z flag = 0, 1 arg
-            //EE - increment the value of a byte, 2 args
-            //FF - system call
         }
 
         //function to convert string to hex

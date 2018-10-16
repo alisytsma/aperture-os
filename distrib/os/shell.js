@@ -409,7 +409,6 @@ var TSOS;
         };
         //run a program
         Shell.prototype.run = function (args) {
-            //_CPU.runProgram(args);
             _CPU.runningPID = args;
             _CPU.isExecuting = true;
         };

@@ -21,7 +21,7 @@ module TSOS {
 
         constructor(public processId: string,
                     public status: string = "Ready",
-                    public PC: string = "0",
+                    public PC: number = 0,
                     public Acc: string = "0",
                     public IR: string = "0",
                     public Xreg: string = "0",
@@ -31,7 +31,7 @@ module TSOS {
 
         public init(): void {
             this.status = "Ready";
-            this.PC = "0";
+            this.PC = 0;
             this.Acc = "0";
             this.IR = "0";
             this.Xreg = "0";

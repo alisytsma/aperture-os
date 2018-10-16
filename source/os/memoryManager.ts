@@ -10,13 +10,6 @@ module TSOS {
 
     export class MemoryManager {
 
-        constructor(){
-        }
-
-        public init(): void {
-
-        }
-
         public static updateMemory(input: string):void{
             var countRow = 0;
             var countCol = 0;

@@ -480,10 +480,8 @@ module TSOS {
 
         //run a program
         public run(args){
-            //_CPU.runProgram(args);
             _CPU.runningPID = args;
             _CPU.isExecuting = true;
-
         }
     }
 }

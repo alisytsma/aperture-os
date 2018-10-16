@@ -10,11 +10,12 @@ module TSOS {
 
     export class MemoryAccessor {
 
-        constructor() {
-
+        public static readMemory(column: number, row: number): void {
+            return _Memory.memArray[column][row];
         }
 
-        public init(): void {
+        public static writeMemory(column: number, row: number,  val: string): void{
+            _Memory.memArray[column][row] = val;
 
         }
     }
