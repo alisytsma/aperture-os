@@ -1,5 +1,9 @@
 ///<reference path="../globals.ts" />
 ///<reference path="../os/canvastext.ts" />
+///<reference path="../host/devices.ts" />
+///<reference path="../os/kernel.ts" />
+///<reference path="../host/cpu.ts" />
+
 
 /* ------------
      Control.ts
@@ -215,10 +219,10 @@ module TSOS {
             _Memory.memArrayPosition = 0;
         }
 
-        public static updatePCB(pid: string, status: string, pc: string, acc: string, ir: string, xreg: string, yreg: string, zflag: string): void {
+        public static updatePCB(pid: string, status: string, pc: number, acc: string, ir: string, xreg: string, yreg: string, zflag: string): void {
             document.getElementById("pcbPID").innerHTML = pid;
             document.getElementById("pcbStatus").innerHTML = status;
-            document.getElementById("pcbPC").innerHTML = pc;
+            document.getElementById("pcbPC").innerHTML = pc.toString();
             document.getElementById("pcbAcc").innerHTML = acc;
             document.getElementById("pcbIR").innerHTML = ir;
             document.getElementById("pcbXreg").innerHTML = xreg;
@@ -226,8 +230,8 @@ module TSOS {
             document.getElementById("pcbZflag").innerHTML = zflag;
         }
 
-        public static updateCPU(PC: string, Acc: string, IR: string, Xreg: string, Yreg: string, Zflag: string): void {
-            document.getElementById("PC").innerHTML = PC;
+        public static updateCPU(PC: number, Acc: string, IR: string, Xreg: string, Yreg: string, Zflag: string): void {
+            document.getElementById("PC").innerHTML = PC.toString();
             document.getElementById("Acc").innerHTML = Acc;
             document.getElementById("IR").innerHTML = IR;
             document.getElementById("Xreg").innerHTML = Xreg;

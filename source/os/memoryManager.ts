@@ -1,4 +1,5 @@
 ///<reference path="../globals.ts" />
+///<reference path="../host/control.ts" />
 
 /* ------------
      MemoryManager.ts

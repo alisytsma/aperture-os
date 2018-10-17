@@ -1,4 +1,6 @@
 ///<reference path="../globals.ts" />
+///<reference path="../host/control.ts" />
+
 
 /* ------------
      MemoryAccessor.ts
@@ -10,7 +12,7 @@ module TSOS {
 
     export class MemoryAccessor {
 
-        public static readMemory(position: number): void {
+        public static readMemory(position: number): string {
             return _Memory.memArray[position];
         }
 

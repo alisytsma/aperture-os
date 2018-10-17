@@ -1,5 +1,8 @@
 ///<reference path="../globals.ts" />
 ///<reference path="../os/canvastext.ts" />
+///<reference path="../host/devices.ts" />
+///<reference path="../os/kernel.ts" />
+///<reference path="../host/cpu.ts" />
 /* ------------
      Control.ts
 
@@ -184,7 +187,7 @@ var TSOS;
         Control.updatePCB = function (pid, status, pc, acc, ir, xreg, yreg, zflag) {
             document.getElementById("pcbPID").innerHTML = pid;
             document.getElementById("pcbStatus").innerHTML = status;
-            document.getElementById("pcbPC").innerHTML = pc;
+            document.getElementById("pcbPC").innerHTML = pc.toString();
             document.getElementById("pcbAcc").innerHTML = acc;
             document.getElementById("pcbIR").innerHTML = ir;
             document.getElementById("pcbXreg").innerHTML = xreg;
@@ -192,7 +195,7 @@ var TSOS;
             document.getElementById("pcbZflag").innerHTML = zflag;
         };
         Control.updateCPU = function (PC, Acc, IR, Xreg, Yreg, Zflag) {
-            document.getElementById("PC").innerHTML = PC;
+            document.getElementById("PC").innerHTML = PC.toString();
             document.getElementById("Acc").innerHTML = Acc;
             document.getElementById("IR").innerHTML = IR;
             document.getElementById("Xreg").innerHTML = Xreg;

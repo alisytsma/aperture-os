@@ -2,6 +2,10 @@
 ///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
+///<reference path="memoryManager.ts" />
+///<reference path="../host/control.ts" />
+
+
 
 
 /* ------------
@@ -484,14 +488,14 @@ module TSOS {
             //console.log("PID: " + _OsShell.pidCount);
             if(_OsShell.pidCount == args) {
                 _CPU.runningPID = args;
-                _CPU.PC = 0;
+                _CPU.position = 0;
                 _CPU.Acc = "0";
                 _CPU.IR = "0";
                 _CPU.Xreg = "0";
                 _CPU.Yreg = "0";
                 _CPU.Zflag = "0";
                 _CPU.isExecuting = false;
-                TSOS.Control.updateCPU(_CPU.PC, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+                TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
                 if(_CPU.singleStep == false)
                     _CPU.isExecuting = true;
             } else {

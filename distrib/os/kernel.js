@@ -1,5 +1,10 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="../host/control.ts" />
+///<reference path="deviceDriverKeyboard.ts" />
+///<reference path="shell.ts" />
+///<reference path="../host/memory.ts" />
+///<reference path="processControlBlock.ts" />
 /* ------------
      Kernel.ts
 
@@ -143,7 +148,7 @@ var TSOS;
         // - WriteFile
         // - CloseFile
         Kernel.prototype.createProcess = function (pid) {
-            var newProc = new TSOS.ProcessControlBlock(pid);
+            var newProc = new TSOS.ProcessControlBlock(pid.toString());
             this.readyQueue[0] = newProc;
             newProc.init();
         };

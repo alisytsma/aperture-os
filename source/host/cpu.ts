@@ -1,7 +1,10 @@
 ///<reference path="../globals.ts" />
+///<reference path="../host/control.ts" />
+///<reference path="../host/memoryAccessor.ts" />
+///<reference path="../os/memoryManager.ts" />
 
 /* ------------
-     CPU.tss
+     CPU.ts
 
      Requires global.ts.
 
@@ -82,6 +85,8 @@ module TSOS {
         public opCodes(input: string): void {
             var addr;
             var arg;
+            var memVal;
+
 
             switch(input){
                 //A9 - load acc with const, 1 arg
@@ -219,7 +224,6 @@ module TSOS {
                     var xValue = (+this.Xreg);
                     //console.log("XVal: " + this.Xreg);
                     //find address corresponding to user input and add it to acc value
-                    var memVal;
                     memVal = parseInt(TSOS.MemoryAccessor.readMemory(+arg),16);
                    // console.log("Mem Val: " + memVal);
 
@@ -241,7 +245,7 @@ module TSOS {
 
                         // get the branch value from memory
                         console.log("Was at location " + this.position);
-                        var arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
+                        arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
                         var newLocation = parseInt(arg, 16) + this.position;
 
                         console.log("Add " + parseInt(arg, 16));
@@ -266,7 +270,7 @@ module TSOS {
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = parseInt(addr, 16);
                     //add 1 to position in mem
-                    var memVal = parseInt(+TSOS.MemoryAccessor.readMemory(+arg).toString,16) + 1;
+                    memVal = +TSOS.MemoryAccessor.readMemory(+arg) + 1;
 
                     TSOS.MemoryAccessor.writeMemory((+arg), memVal.toString());
 
@@ -297,7 +301,7 @@ module TSOS {
                             //Go to this spot in the memory
                             var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
                             //Get the char code from this spot's value
-                            var char = String.fromCharCode(parseInt(byte, 16));
+                            var char = String.fromCharCode(+byte);
                             yRegVal++;
                             //add char to string
                             stringBuilder += char;
