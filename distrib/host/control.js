@@ -76,18 +76,17 @@ var TSOS;
             document.getElementById("display").focus();
             //_ProcessControlBlock = new ProcessControlBlock(0,0,0,0,0,0,0,0);  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             // _ProcessControlBlock.init();
-            // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new TSOS.Kernel();
             _Kernel.krnBootstrap(); // _GLaDOS.afterStartup() will get called in there, if configured.
-            //create new memory instance
-            _Memory = new TSOS.Memory();
-            _Memory.init();
             this.loadTable();
+        };
+        Control.initCpu = function () {
+            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU.init();
+            //console.log("reinit");
         };
         Control.hostBtnHaltOS_click = function (btn) {
             Control.hostLog("Emergency halt", "host");
@@ -135,7 +134,7 @@ var TSOS;
             for (var i = this.tbl.rows.length - 1; i >= 0; i--)
                 this.tbl.deleteRow(i);
             //make the table disappear
-            tableDiv.removeChild(this.tbl);
+            //tableDiv.removeChild(this.tbl);
         };
         //function to update the memory table
         Control.loadTable = function () {

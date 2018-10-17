@@ -49,6 +49,12 @@ var TSOS;
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
             _OsShell.init();
+            //create new memory instance
+            _Memory = new TSOS.Memory();
+            _Memory.init();
+            // ... Create and initialize the CPU (because it's part of the hardware)  ...
+            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -138,7 +144,7 @@ var TSOS;
         // - CloseFile
         Kernel.prototype.createProcess = function (pid) {
             var newProc = new TSOS.ProcessControlBlock(pid);
-            this.readyQueue.push(newProc);
+            this.readyQueue[0] = newProc;
             newProc.init();
         };
         //

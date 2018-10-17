@@ -26,7 +26,7 @@
 module TSOS {
 
     export class Control {
-        public static tbl  = document.createElement('table');
+        public static tbl = document.createElement('table');
 
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
@@ -42,7 +42,7 @@ module TSOS {
 
             // Clear the log text box.
             // Use the TypeScript cast to HTMLInputElement
-            (<HTMLInputElement> document.getElementById("taHostLog")).value="";
+            (<HTMLInputElement> document.getElementById("taHostLog")).value = "";
 
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
@@ -66,7 +66,7 @@ module TSOS {
             var now: number = new Date().getTime();
 
             // Build the log string.
-            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
+            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
 
             // Update the log console.
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
@@ -92,23 +92,24 @@ module TSOS {
             document.getElementById("display").focus();
 
             //_ProcessControlBlock = new ProcessControlBlock(0,0,0,0,0,0,0,0);  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-           // _ProcessControlBlock.init();
+            // _ProcessControlBlock.init();
 
-            // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
-            // ... then set the host clock pulse ...
+             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
 
-            //create new memory instance
-            _Memory = new Memory();
-            _Memory.init();
+
 
             this.loadTable();
 
+        }
+
+        public static initCpu(): void {
+            _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU.init();
+            //console.log("reinit");
         }
 
         public static hostBtnHaltOS_click(btn): void {
@@ -131,7 +132,7 @@ module TSOS {
 
         //enable/disable step mode
         public static hostBtnStepEna_click(btn): void {
-            if(_CPU.singleStep == false) {
+            if (_CPU.singleStep == false) {
                 _CPU.singleStep = true;
                 (<HTMLInputElement> document.getElementById("btnStep")).disabled = false;
                 (<HTMLInputElement> document.getElementById("btnStepEna")).value = "Disable Single Step Mode";
@@ -157,17 +158,17 @@ module TSOS {
         }
 
         //function to clear the memory table
-        public static clearTable():void {
+        public static clearTable(): void {
             var tableDiv = document.getElementById("divMemory");
             //loop down to delete every row
-            for(var i = this.tbl.rows.length - 1; i >= 0; i--)
+            for (var i = this.tbl.rows.length - 1; i >= 0; i--)
                 this.tbl.deleteRow(i);
             //make the table disappear
-            tableDiv.removeChild(this.tbl);
+            //tableDiv.removeChild(this.tbl);
         }
 
         //function to update the memory table
-        public static loadTable():void {
+        public static loadTable(): void {
             //find table div and set id
             var tableDiv = document.getElementById("divMemory");
             this.tbl.setAttribute("id", "tableMemory");
@@ -175,19 +176,19 @@ module TSOS {
             var memNum = 0;
 
             //loop through 32 times to create 32 rows
-            for(var i = 0; i < 32; i++){
+            for (var i = 0; i < 32; i++) {
                 var tr = this.tbl.insertRow();
                 //create 9 columns in those rows
-                for(var j = 0; j < 9; j++){
+                for (var j = 0; j < 9; j++) {
                     var td = tr.insertCell();
                     //if first in column
-                    if(j == 0) {
+                    if (j == 0) {
                         var hexNum = memNum.toString(16).toUpperCase();
                         //if single digit, add 0x00 in front
-                        if(hexNum.length == 1)
+                        if (hexNum.length == 1)
                             td.appendChild(document.createTextNode("0x00" + hexNum));
                         //if two digits, add 0x0 in front
-                        else if(hexNum.length == 2)
+                        else if (hexNum.length == 2)
                             td.appendChild(document.createTextNode("0x0" + hexNum));
                         //if three digits, add 0x in front
                         else
@@ -233,5 +234,5 @@ module TSOS {
             document.getElementById("Yreg").innerHTML = Yreg;
             document.getElementById("Zflag").innerHTML = Zflag;
         }
-
+    }
 }

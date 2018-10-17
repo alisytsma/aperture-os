@@ -21,7 +21,7 @@ module TSOS {
 
         constructor(public processId: string,
                     public status: string = "Ready",
-                    public PC: number = 0,
+                    public position: number = 0,
                     public Acc: string = "0",
                     public IR: string = "0",
                     public Xreg: string = "0",
@@ -31,14 +31,14 @@ module TSOS {
 
         public init(): void {
             this.status = "Ready";
-            this.PC = 0;
+            this.position = 0;
             this.Acc = "0";
             this.IR = "0";
             this.Xreg = "0";
             this.Yreg = "0";
             this.Zflag = "0";
 
-            TSOS.Control.updatePCB(this.processId, this.status, this.PC, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB(this.processId, this.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         }
 
     }

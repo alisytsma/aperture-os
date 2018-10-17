@@ -63,6 +63,14 @@ module TSOS {
             _OsShell = new Shell();
             _OsShell.init();
 
+            //create new memory instance
+            _Memory = new Memory();
+            _Memory.init();
+            // ... Create and initialize the CPU (because it's part of the hardware)  ...
+            _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+
+
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -138,6 +146,7 @@ module TSOS {
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
+
         }
 
         public krnTimerISR() {
@@ -162,7 +171,7 @@ module TSOS {
 
         public createProcess(pid: number){
             var newProc = new ProcessControlBlock(pid);
-            this.readyQueue.push(newProc);
+            this.readyQueue[0]=newProc;
             newProc.init();
         }
 
