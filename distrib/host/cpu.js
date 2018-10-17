@@ -79,6 +79,8 @@ var TSOS;
             TSOS.Control.initCpu();
             //new line on shell
             _StdOut.advanceLine();
+            _Console.clearLine();
+            _StdOut.putText(_OsShell.promptStr);
         };
         Cpu.prototype.opCodes = function (input) {
             var addr;
@@ -123,16 +125,14 @@ var TSOS;
                     console.log("Code 6D at position " + this.position);
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
-                    //get acc value
+                    //convert address to decimal
                     arg = parseInt(addr, 16);
-                    var accValue = (+this.Acc);
-                    // console.log("Acc Val: " + accValue + ", add: " + arg);
-                    //find address corresponding to user input and add it to acc value
-                    accValue += (+arg);
-                    // console.log("New acc Val: " + accValue);
-                    //make sure valid input
-                    if (!isNaN(accValue))
-                        this.Acc = accValue.toString();
+                    //find this address in the memory
+                    var argAddress = TSOS.MemoryAccessor.readMemory(arg);
+                    //convert result to decimal
+                    var accValue = parseInt(argAddress, 16);
+                    //add the acc value to the acc
+                    this.Acc += accValue;
                     this.position += 3;
                     break;
                 //A2 - load x reg with constant, 1 arg

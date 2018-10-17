@@ -66,12 +66,16 @@ var TSOS;
                     this.storeInput.unshift(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
+                    this.storeCommands = [];
+                    this.tabCount = 0;
                 }
                 else if (chr === String.fromCharCode(9)) { //tab
                     this.autoComplete(this.buffer);
                     this.tabCount++;
                 }
                 else if (chr === String.fromCharCode(8)) { //backspace
+                    this.storeCommands = [];
+                    this.tabCount = 0;
                     this.backspace();
                 }
                 else if (chr === String.fromCharCode(38)) { //up arrow
@@ -192,11 +196,12 @@ var TSOS;
         Console.prototype.autoComplete = function (input) {
             //loop through all commands
             for (var i = 0; i < _OsShell.commandList.length; i++) {
-                //compare input to commandlist
-                if (_OsShell.commandList[i].command.includes(input)) {
-                    //if input matches, push to array
-                    this.storeCommands.push(_OsShell.commandList[i].command);
-                }
+                for (var j = 0; j < input.length; j++)
+                    //compare input to commandlist
+                    if (_OsShell.commandList[i].command[0] == input[0]) {
+                        //if input matches, push to array
+                        this.storeCommands.push(_OsShell.commandList[i].command);
+                    }
             }
             //clear line and print text
             this.clearLine();

@@ -438,10 +438,17 @@ module TSOS {
         }
 
         public shellStatus(args){
-            //set status equal to input
-            this.status = args;
+            //if status arguments
+            if (args.length > 0) {
+                //loop for length of arguments to add them together to make a
+                //sentence with a space inbetween
+                for (var i = 0; i < args.length; i++) {
+                    var sentenceBuilder = args[i];
+                    this.status += sentenceBuilder + " ";
+                }
+            }
             //print update that status has been changed
-            _StdOut.putText("Status set to " + args);
+            _StdOut.putText("Status set to " + this.status);
             //update status on host
             document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
         }

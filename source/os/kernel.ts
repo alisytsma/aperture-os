@@ -181,7 +181,6 @@ module TSOS {
             newProc.init();
         }
 
-
         //
         // OS Utility Routines
         //
