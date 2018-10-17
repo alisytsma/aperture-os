@@ -296,12 +296,14 @@ module TSOS {
                         var yRegVal = (+this.Yreg);
                         //Go to this spot in the memory
                         var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
+                        console.log(yRegVal);
                         //Loop until we reach "00"
                         while (byte != "00") {
                             //Go to this spot in the memory
                             var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
                             //Get the char code from this spot's value
-                            var char = String.fromCharCode(+byte);
+                            var char = String.fromCharCode(parseInt(byte,16));
+                            console.log("Char: " + char + ", byte: " + byte);
                             yRegVal++;
                             //add char to string
                             stringBuilder += char;
