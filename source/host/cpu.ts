@@ -78,7 +78,11 @@ module TSOS {
             //reset table
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
+            //reset CPU
             TSOS.Control.initCpu();
+            //new line on shell
+            _StdOut.advanceLine();
+
         }
 
 
@@ -217,12 +221,9 @@ module TSOS {
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
-                    //console.log("Mem add: " + addr);
                     arg = parseInt(addr, 16);
-                    //console.log("Conv: " + arg);
                     //get xreg value
                     var xValue = (+this.Xreg);
-                    //console.log("XVal: " + this.Xreg);
                     //find address corresponding to user input and add it to acc value
                     memVal = parseInt(TSOS.MemoryAccessor.readMemory(+arg),16);
                    // console.log("Mem Val: " + memVal);
@@ -239,23 +240,23 @@ module TSOS {
                 //D0 - branch n bytes if z flag = 0, 1 arg
                 case "D0":
                     //if zflag is 0
-
                     if ((+this.Zflag) == 0) {
                         console.log("Code D0 at position " + this.position);
 
-                        // get the branch value from memory
+                        //get number to branch from memory
                         console.log("Was at location " + this.position);
                         arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
                         var newLocation = parseInt(arg, 16) + this.position;
 
                         console.log("Add " + parseInt(arg, 16));
-                        // if the branch will exceed the memory, go back to 0
+                        //if the branch will exceed the size of the program, loop back around
                         if (newLocation > TSOS.MemoryManager.endProgram) {
                             newLocation = newLocation % 256;
                         }
-                        // Add 2 to account for the branch op and the location
+                        //add 2 to the position and add in the new location
                         this.position = newLocation + 2;
                         console.log("Now at location " + this.position);
+                    //otherwise, just move up two
                     } else {
                         this.position += 2;
                     }
