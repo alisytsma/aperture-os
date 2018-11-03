@@ -407,10 +407,16 @@ var TSOS;
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if (valid) {
-                _OsShell.pidCount++;
-                _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
-                TSOS.MemoryManager.updateMemory(input.toString());
-                _Kernel.createProcess(_OsShell.pidCount);
+                if (_Memory.memArraySegment < 3) {
+                    _OsShell.pidCount++;
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    _Kernel.createProcess(_OsShell.pidCount);
+                    TSOS.MemoryManager.updateMemory(input.toString());
+                    _Memory.memArraySegment++;
+                }
+                else {
+                    _StdOut.putText("Memory full");
+                }
             }
         };
         //force a kernel error

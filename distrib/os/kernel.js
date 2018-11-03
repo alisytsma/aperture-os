@@ -148,7 +148,7 @@ var TSOS;
         // - WriteFile
         // - CloseFile
         Kernel.prototype.createProcess = function (pid) {
-            var newProc = new TSOS.ProcessControlBlock(pid.toString());
+            var newProc = new TSOS.ProcessControlBlock(pid.toString(), _Memory.memArraySegment);
             this.readyQueue[0] = newProc;
             newProc.init();
         };

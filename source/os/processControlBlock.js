@@ -16,7 +16,7 @@
 var TSOS;
 (function (TSOS) {
     var ProcessControlBlock = /** @class */ (function () {
-        function ProcessControlBlock(processId, status, position, Acc, IR, Xreg, Yreg, Zflag) {
+        function ProcessControlBlock(processId, segment, status, position, Acc, IR, Xreg, Yreg, Zflag, turnaroundTime, waitTime) {
             if (status === void 0) { status = "Ready"; }
             if (position === void 0) { position = 0; }
             if (Acc === void 0) { Acc = "0"; }
@@ -24,7 +24,10 @@ var TSOS;
             if (Xreg === void 0) { Xreg = "0"; }
             if (Yreg === void 0) { Yreg = "0"; }
             if (Zflag === void 0) { Zflag = "0"; }
+            if (turnaroundTime === void 0) { turnaroundTime = 0; }
+            if (waitTime === void 0) { waitTime = 0; }
             this.processId = processId;
+            this.segment = segment;
             this.status = status;
             this.position = position;
             this.Acc = Acc;
@@ -32,6 +35,8 @@ var TSOS;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.turnaroundTime = turnaroundTime;
+            this.waitTime = waitTime;
         }
         ProcessControlBlock.prototype.init = function () {
             this.status = "Ready";
@@ -41,6 +46,8 @@ var TSOS;
             this.Xreg = "0";
             this.Yreg = "0";
             this.Zflag = "0";
+            this.turnaroundTime = 0;
+            this.waitTime = 0;
             TSOS.Control.updatePCB(this.processId, this.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
         return ProcessControlBlock;

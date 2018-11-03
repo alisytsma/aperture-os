@@ -178,37 +178,42 @@ module TSOS {
             this.tbl.setAttribute("id", "tableMemory");
             //set equal to number that memory column header should be equal to
             var memNum = 0;
+            console.log(_Memory.memArray.toString());
 
-            //loop through 32 times to create 32 rows
-            for (var i = 0; i < 32; i++) {
-                var tr = this.tbl.insertRow();
-                //create 9 columns in those rows
-                for (var j = 0; j < 9; j++) {
-                    var td = tr.insertCell();
-                    //if first in column
-                    if (j == 0) {
-                        var hexNum = memNum.toString(16).toUpperCase();
-                        //if single digit, add 0x00 in front
-                        if (hexNum.length == 1)
-                            td.appendChild(document.createTextNode("0x00" + hexNum));
-                        //if two digits, add 0x0 in front
-                        else if (hexNum.length == 2)
-                            td.appendChild(document.createTextNode("0x0" + hexNum));
-                        //if three digits, add 0x in front
-                        else
-                            td.appendChild(document.createTextNode("0x" + hexNum));
-                    }
-                    //if not first in column
-                    else {
-                        //add memory value to cell
-                        td.appendChild(document.createTextNode(_Memory.memArray[_Memory.memArrayPosition]));
+            for(var p = 0; p < 3; p++) {
+                //loop through 32 times to create 32 rows
+                for (var i = 0; i < 32; i++) {
+                    var tr = this.tbl.insertRow();
+                    //create 9 columns in those rows
+                    for (var j = 0; j < 9; j++) {
+                        var td = tr.insertCell();
+                        //if first in column
+                        if (j == 0) {
+                            var hexNum = memNum.toString(16).toUpperCase();
+                            //if single digit, add 0x00 in front
+                            if (hexNum.length == 1)
+                                td.appendChild(document.createTextNode("0x00" + hexNum));
+                            //if two digits, add 0x0 in front
+                            else if (hexNum.length == 2)
+                                td.appendChild(document.createTextNode("0x0" + hexNum));
+                            //if three digits, add 0x in front
+                            else
+                                td.appendChild(document.createTextNode("0x" + hexNum));
+                        }
+                        //if not first in column
+                        else {
+                            //add memory value to cell
+                            td.appendChild(document.createTextNode(_Memory.memArray[p][_Memory.memArrayPosition]));
 
-                        //if not at the end of the row, increment row count
-                        _Memory.memArrayPosition++;
+                            //increment row count
+                            _Memory.memArrayPosition++;
+                        }
                     }
+                    //increment column header by 8
+                    console.log("P: " + p + " i: " + i)
+                    memNum += 8;
                 }
-                //increment column header by 8
-                memNum += 8;
+                _Memory.memArrayPosition = 0;
             }
             //add to page
             tableDiv.appendChild(this.tbl);

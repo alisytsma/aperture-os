@@ -20,13 +20,16 @@ module TSOS {
     export class ProcessControlBlock {
 
         constructor(public processId: string,
+                    public segment: number,
                     public status: string = "Ready",
                     public position: number = 0,
                     public Acc: string = "0",
                     public IR: string = "0",
                     public Xreg: string = "0",
                     public Yreg: string = "0",
-                    public Zflag: string = "0") {
+                    public Zflag: string = "0",
+                    public turnaroundTime: number = 0,
+                    public waitTime: number = 0) {
         }
 
         public init(): void {
@@ -37,6 +40,9 @@ module TSOS {
             this.Xreg = "0";
             this.Yreg = "0";
             this.Zflag = "0";
+            this.turnaroundTime = 0;
+            this.waitTime = 0;
+
 
             TSOS.Control.updatePCB(this.processId, this.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         }

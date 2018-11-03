@@ -176,7 +176,7 @@ module TSOS {
         // - CloseFile
 
         public createProcess(pid: number){
-            var newProc = new ProcessControlBlock(pid.toString());
+            var newProc = new ProcessControlBlock(pid.toString(), _Memory.memArraySegment);
             this.readyQueue[0]=newProc;
             newProc.init();
         }
