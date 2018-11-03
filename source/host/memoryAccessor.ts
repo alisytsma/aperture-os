@@ -13,11 +13,11 @@ module TSOS {
     export class MemoryAccessor {
 
         public static readMemory(position: number): string {
-            return _Memory.memArray[_Memory.memArraySegment][position];
+            return _Memory.memArray[_CPU.program.segment][position];
         }
 
         public static writeMemory(position: number,  val: string): void {
-            console.log("Current val: " + _Memory.memArray[position] + ", pos: " + position + ", updated val: " + val);
+            console.log("Segment: " + _CPU.program.segment + "Current val: " + _Memory.memArray[_CPU.program.segment][position] + ", pos: " + position + ", updated val: " + val);
             val = (+val).toString(16).toUpperCase();
             if(val.length == 1)
                 _Memory.memArray[_CPU.program.segment][position] = "0" + val;
