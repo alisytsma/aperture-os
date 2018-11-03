@@ -142,7 +142,7 @@ var TSOS;
             this.tbl.setAttribute("id", "tableMemory");
             //set equal to number that memory column header should be equal to
             var memNum = 0;
-            console.log(_Memory.memArray.toString());
+            //console.log(_Memory.memArray.toString());
             for (var p = 0; p < 3; p++) {
                 //loop through 32 times to create 32 rows
                 for (var i = 0; i < 32; i++) {
@@ -184,13 +184,13 @@ var TSOS;
             //reset counters to 0
             _Memory.memArrayPosition = 0;
         };
-        Control.updatePCB = function (pid, status, pc, acc, ir, xreg, yreg, zflag) {
+        Control.updatePCB = function () {
             this.clearPCB();
             //find table div and set id
             var divPCB = document.getElementById("divPCB");
             this.tblPCB.setAttribute("id", "tablePCB");
             //set equal to number that memory column header should be equal to
-            console.log(_Memory.memArray.toString());
+            //console.log(_Memory.memArray.toString());
             //loop through for the length of the ready queue to get PCB count
             for (var i = 0; i <= _Kernel.readyQueue.length; i++) {
                 var tr = this.tblPCB.insertRow();

@@ -179,7 +179,7 @@ module TSOS {
             var newProc = new ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
             //console.log("Create Process: " + TSOS.MemoryManager.allocateMemory());
             this.readyQueue.push(newProc);
-            TSOS.Control.updatePCB(newProc.processId, newProc.status, newProc.position, newProc.Acc, newProc.IR, newProc.Xreg, newProc.Yreg, newProc.Zflag);
+            TSOS.Control.updatePCB();
 
             for(var i = 0; i < this.readyQueue.length; i++)
                 console.log(this.readyQueue[i].processId);

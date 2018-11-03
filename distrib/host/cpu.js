@@ -35,7 +35,6 @@ var TSOS;
             this.Zflag = Zflag;
             this.isExecuting = isExecuting;
             this.runningPID = 0;
-            //public position = 0;
             this.singleStep = false;
         }
         Cpu.prototype.init = function () {
@@ -50,7 +49,7 @@ var TSOS;
         };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
-            // console.log("Position: " + this.position);
+            console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             this.program = _Kernel.readyQueue[this.runningPID];
@@ -64,21 +63,13 @@ var TSOS;
             }
         };
         Cpu.prototype.terminateProgram = function () {
-            var done = true;
             //set status to terminated and update block
-            this.program.status = "Terminated";
-            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
-                if (_Kernel.readyQueue[i].status == "Running") {
-                    done = false;
-                }
-            }
-            if (done)
-                this.terminateOS();
-        };
-        Cpu.prototype.terminateOS = function () {
+            this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB();
             //mark isExecuting as false
             this.isExecuting = false;
+        };
+        Cpu.prototype.terminateOS = function () {
             //mark single step as false
             TSOS.Control.disableSingleStep();
             //set memory back to 0
@@ -273,7 +264,8 @@ var TSOS;
                     break;
             }
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            this.program.updateValues("Running", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB();
         };
         return Cpu;
     }());

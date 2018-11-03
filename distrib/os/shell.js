@@ -433,7 +433,6 @@ var TSOS;
             }
             if (validPID) {
                 _CPU.runningPID = args;
-                _CPU.program = _Kernel.readyQueue[args];
                 _CPU.position = 0;
                 _CPU.Acc = "0";
                 _CPU.IR = "0";

@@ -44,5 +44,15 @@ module TSOS {
             this.waitTime = 0;
         }
 
+        public updateValues(status: string, pc: number, acc: string, ir: string, xreg: string, yreg: string, zflag: string):void{
+            this.status = status;
+            this.position = pc;
+            this.Acc = acc;
+            this.IR = ir;
+            this.Xreg = xreg;
+            this.Yreg = yreg;
+            this.Zflag = zflag;
+        }
+
     }
 }

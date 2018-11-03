@@ -14,7 +14,7 @@ module TSOS {
         public static endProgram;
 
         public static updateMemory(input: string):void {
-            console.log("Before: " + _Memory.memArray.toString());
+            //.log("Before: " + _Memory.memArray.toString());
             var position = 0;
             for (var i = 0; i < input.length; i++) {
                 if(input.charAt(i) != " ") {
@@ -24,7 +24,7 @@ module TSOS {
                 }
             }
             this.endProgram = position;
-            console.log("After: " + _Memory.memArray.toString() + " length: " + this.endProgram);
+            //console.log("After: " + _Memory.memArray.toString() + " length: " + this.endProgram);
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
         }
@@ -33,17 +33,14 @@ module TSOS {
             if(_Memory.mem0Free){
                 _Memory.memArraySegment = 0;
                 _Memory.mem0Free = false;
-                console.log("Free: 0");
                 return 0;
             } else if(_Memory.mem1Free){
                 _Memory.memArraySegment = 1;
                 _Memory.mem1Free = false;
-                console.log("Free: 1");
 
                 return 1;
             } else if(_Memory.mem2Free){
                 _Memory.memArraySegment = 2;
-                console.log("Free: 2");
                 _Memory.mem2Free = false;
                 return 2;
             } else {

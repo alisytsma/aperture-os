@@ -49,6 +49,15 @@ var TSOS;
             this.turnaroundTime = 0;
             this.waitTime = 0;
         };
+        ProcessControlBlock.prototype.updateValues = function (status, pc, acc, ir, xreg, yreg, zflag) {
+            this.status = status;
+            this.position = pc;
+            this.Acc = acc;
+            this.IR = ir;
+            this.Xreg = xreg;
+            this.Yreg = yreg;
+            this.Zflag = zflag;
+        };
         return ProcessControlBlock;
     }());
     TSOS.ProcessControlBlock = ProcessControlBlock;

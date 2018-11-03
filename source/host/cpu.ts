@@ -24,7 +24,6 @@ module TSOS {
 
         public runningPID = 0;
         public program;
-        //public position = 0;
         public singleStep = false;
 
         constructor(public position: number = 0,
@@ -51,7 +50,8 @@ module TSOS {
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
-           // console.log("Position: " + this.position);
+            console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
+
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             this.program = _Kernel.readyQueue[this.runningPID];
@@ -66,27 +66,15 @@ module TSOS {
         }
 
         public terminateProgram(): void {
-            var done = true;
             //set status to terminated and update block
-            this.program.status = "Terminated";
-            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            for(var i = 0; i < _Kernel.readyQueue.length; i++) {
-                if (_Kernel.readyQueue[i].status == "Running") {
-                    done = false;
-                }
-            }
-
-            if(done)
-                this.terminateOS();
+            this.program.updateValues("Terminated",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB();
+            //mark isExecuting as false
+            this.isExecuting = false;
 
         }
 
-
-
-
         public terminateOS(): void {
-            //mark isExecuting as false
-            this.isExecuting = false;
             //mark single step as false
             TSOS.Control.disableSingleStep();
             //set memory back to 0
@@ -107,7 +95,6 @@ module TSOS {
             var addr;
             var arg;
             var memVal;
-
 
             switch(input){
                 //A9 - load acc with const, 1 arg
@@ -311,7 +298,9 @@ module TSOS {
                     break;
             }
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            TSOS.Control.updatePCB(this.program.processId, this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            this.program.updateValues("Running",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updatePCB();
+
         }
     }
 }
