@@ -128,6 +128,11 @@ module TSOS {
                 "run",
                 "<integer> - Run a command by process id.");
             this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new ShellCommand(this.clearmem,
+                "clearmem",
+                "Clear all partition ");
+            this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -478,14 +483,12 @@ module TSOS {
                 _StdOut.putText("No text entered, not valid hex input.");
             }
             if(valid) {
-                if(_Memory.memArraySegment < 3){
+                if(TSOS.MemoryManager.checkMemory()){
                     _OsShell.pidCount++;
-                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     _Kernel.createProcess(_OsShell.pidCount);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.MemoryManager.updateMemory(input.toString());
-                    _Memory.memArraySegment++;
-                } else {
-                    _StdOut.putText("Memory full");
+                    //_Memory.memArraySegment++;
                 }
             }
         }
@@ -497,9 +500,16 @@ module TSOS {
 
         //run a program
         public run(args){
+            var validPID = false;
             //console.log("PID: " + _OsShell.pidCount);
-            if(_OsShell.pidCount == args) {
+            for(var i = 0; i < _Kernel.readyQueue.length; i++){
+                if(_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status != "Terminated")
+                    validPID = true;
+            }
+
+            if(validPID) {
                 _CPU.runningPID = args;
+                _CPU.program = _Kernel.readyQueue[args];
                 _CPU.position = 0;
                 _CPU.Acc = "0";
                 _CPU.IR = "0";
@@ -513,6 +523,16 @@ module TSOS {
             } else {
                 _StdOut.putText("Not a valid PID");
             }
+        }
+
+        //clear all memory partition
+        public clearmem(){
+            _Memory.mem0Free = true;
+            _Memory.mem1Free = true;
+            _Memory.mem2Free = true;
+            TSOS.MemoryAccessor.clearMem();
+            TSOS.Control.clearTable();
+            TSOS.Control.loadTable();
         }
     }
 }

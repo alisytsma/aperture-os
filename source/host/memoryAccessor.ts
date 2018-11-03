@@ -20,9 +20,9 @@ module TSOS {
             console.log("Current val: " + _Memory.memArray[position] + ", pos: " + position + ", updated val: " + val);
             val = (+val).toString(16).toUpperCase();
             if(val.length == 1)
-                _Memory.memArray[_Memory.memArraySegment][position] = "0" + val;
+                _Memory.memArray[_CPU.program.segment][position] = "0" + val;
             else
-                _Memory.memArray[_Memory.memArraySegment][position] = val;
+                _Memory.memArray[_CPU.program.segment][position] = val;
             console.log("Update mem: " + _Memory.memArray.toString());
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
@@ -37,7 +37,7 @@ module TSOS {
         }
 
         public static memoryLength(): number{
-            return _Memory.memArray.length;
+            return _Memory.memArray[0].length;
         }
     }
 

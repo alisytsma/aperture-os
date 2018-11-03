@@ -48,7 +48,6 @@ var TSOS;
             this.Zflag = "0";
             this.turnaroundTime = 0;
             this.waitTime = 0;
-            TSOS.Control.updatePCB(this.processId, this.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
         return ProcessControlBlock;
     }());

@@ -10,6 +10,7 @@
 module TSOS {
 
     export class Memory {
+        //I'm so sorry for how ugly my memory display is
         public memArray = [["00","00","00","00","00","00","00","00",
                     "00","00","00","00","00","00","00","00",
                     "00","00","00","00","00","00","00","00",
@@ -109,6 +110,9 @@ module TSOS {
         ];
         public memArrayPosition = 0;
         public memArraySegment = 0;
+        public mem0Free = true;
+        public mem1Free = true;
+        public mem2Free = true;
 
 
         constructor(

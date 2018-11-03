@@ -22,7 +22,7 @@ module TSOS {
 
     export class Cpu {
 
-        public runningPID: number;
+        public runningPID = 0;
         public program;
         //public position = 0;
         public singleStep = false;
@@ -54,21 +54,37 @@ module TSOS {
            // console.log("Position: " + this.position);
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.program = _Kernel.readyQueue[0];
+            this.program = _Kernel.readyQueue[this.runningPID];
             //update status to running
             this.program.status = "Running";
             //send input to opCodes to check what actions need to be performed
             _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.position));
             //update PCB
             if(this.position >= TSOS.MemoryAccessor.memoryLength()){
-                this.terminateOS();
+                this.terminateProgram();
             }
         }
 
-        public terminateOS(): void {
+        public terminateProgram(): void {
+            var done = true;
             //set status to terminated and update block
             this.program.status = "Terminated";
             TSOS.Control.updatePCB(this.program.processId, this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            for(var i = 0; i < _Kernel.readyQueue.length; i++) {
+                if (_Kernel.readyQueue[i].status == "Running") {
+                    done = false;
+                }
+            }
+
+            if(done)
+                this.terminateOS();
+
+        }
+
+
+
+
+        public terminateOS(): void {
             //mark isExecuting as false
             this.isExecuting = false;
             //mark single step as false
@@ -96,7 +112,6 @@ module TSOS {
             switch(input){
                 //A9 - load acc with const, 1 arg
                 case "A9":
-                    console.log("Code A9 at position " + this.position);
                     this.IR = "A9";
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = parseInt(addr, 16);
@@ -120,7 +135,7 @@ module TSOS {
 
                 //8D - store acc in mem, 2 arg
                 case "8D":
-                    console.log("Code 8D at position " + this.position);
+                    console.log("Segment: " + _Memory.memArraySegment)
                     this.IR = "8D";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -133,7 +148,6 @@ module TSOS {
                 //6D - add with carry, 2 arg
                 case "6D":
                     this.IR = "6D";
-                    console.log("Code 6D at position " + this.position);
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -152,7 +166,6 @@ module TSOS {
                 //A2 - load x reg with constant, 1 arg
                 case "A2":
                     this.IR = "A2";
-                    console.log("Code A2 at position " + this.position);
 
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = parseInt(addr, 16);
@@ -164,7 +177,6 @@ module TSOS {
                 //AE - load x reg from mem, 2 arg
                 case "AE":
                     this.IR = "AE";
-                    console.log("Code AE at position " + this.position);
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -177,7 +189,6 @@ module TSOS {
                 //A0 - load y reg with const, 1 arg
                 case "A0":
                     this.IR = "A0";
-                    console.log("Code A0 at position " + this.position);
 
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = parseInt(addr, 16);
@@ -189,7 +200,6 @@ module TSOS {
                 //AC - load y reg from mem. 2 arg
                 case "AC":
                     this.IR = "AC";
-                    console.log("Code AC at position " + this.position);
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -202,21 +212,18 @@ module TSOS {
                 //EA - no op, 0 arg
                 case "EA":
                     this.IR = "EA";
-                    console.log("Code EA at position " + this.position);
                     this.position++;
                     break;
 
                 //00 - break, 0 arg but check for another
                 case "00":
                     this.IR = "00";
-                    console.log("Code 00 at position " + this.position);
-                    this.terminateOS();
+                    this.terminateProgram();
                     break;
 
                 //EC - compare a byte in mem to the x reg, 2 arg
                 case "EC":
                     this.IR = "EC";
-                    console.log("Code EC at position " + this.position);
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -225,7 +232,6 @@ module TSOS {
                     var xValue = (+this.Xreg);
                     //find address corresponding to user input and add it to acc value
                     memVal = parseInt(TSOS.MemoryAccessor.readMemory(+arg),16);
-                   // console.log("Mem Val: " + memVal);
 
                     if(xValue == memVal){
                         this.Zflag = "1";
@@ -240,21 +246,17 @@ module TSOS {
                 case "D0":
                     //if zflag is 0
                     if ((+this.Zflag) == 0) {
-                        console.log("Code D0 at position " + this.position);
 
                         //get number to branch from memory
-                        console.log("Was at location " + this.position);
                         arg = TSOS.MemoryAccessor.readMemory(this.position + 1);
                         var newLocation = parseInt(arg, 16) + this.position;
 
-                        console.log("Add " + parseInt(arg, 16));
                         //if the branch will exceed the size of the program, loop back around
                         if (newLocation > TSOS.MemoryManager.endProgram) {
                             newLocation = newLocation % 256;
                         }
                         //add 2 to the position and add in the new location
                         this.position = newLocation + 2;
-                        console.log("Now at location " + this.position);
                     //otherwise, just move up two
                     } else {
                         this.position += 2;
@@ -264,7 +266,6 @@ module TSOS {
                 //EE - increment the value of a byte, 2 args
                 case "EE":
                     this.IR = "EE";
-                    console.log("Code EE at position " + this.position);
 
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -283,12 +284,9 @@ module TSOS {
                 //FF - system call
                 case "FF":
                     this.IR = "FF";
-                    console.log("Code FF at position " + this.position);
 
                     var stringBuilder = "";
-                    //console.log("FF: " + this.Xreg);
                     if((+this.Xreg) == 1){
-                       // console.log("FF y reg: " + this.Yreg);
                         _StdOut.putText(this.Yreg.toString());
                     } else if ((+this.Xreg) == 2) {
                         var stringBuilder = "";
@@ -296,18 +294,15 @@ module TSOS {
                         var yRegVal = (+this.Yreg);
                         //Go to this spot in the memory
                         var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
-                        console.log(yRegVal);
                         //Loop until we reach "00"
                         while (byte != "00") {
                             //Go to this spot in the memory
                             var byte = TSOS.MemoryAccessor.readMemory(yRegVal);
                             //Get the char code from this spot's value
                             var char = String.fromCharCode(parseInt(byte,16));
-                            console.log("Char: " + char + ", byte: " + byte);
                             yRegVal++;
                             //add char to string
                             stringBuilder += char;
-                            console.log(yRegVal);
                         }
                         //print string
                         _StdOut.putText(stringBuilder);
