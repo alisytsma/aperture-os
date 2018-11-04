@@ -64,7 +64,9 @@ var TSOS;
         };
         Cpu.prototype.terminateProgram = function () {
             //set status to terminated and update block
+            console.log("Before: " + this.program.status);
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            console.log("After: " + this.program.status);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
             //mark isExecuting as false
@@ -265,7 +267,7 @@ var TSOS;
             }
             //update CPU and PCB
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            this.program.updateValues("Running", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            this.program.updateValues(this.program.status, this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB();
         };
         return Cpu;

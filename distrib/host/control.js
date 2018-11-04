@@ -190,7 +190,6 @@ var TSOS;
             var divPCB = document.getElementById("divPCB");
             this.tblPCB.setAttribute("id", "tablePCB");
             //set equal to number that memory column header should be equal to
-            //console.log(_Memory.memArray.toString());
             //loop through for the length of the ready queue to get PCB count
             for (var i = 0; i <= _Kernel.readyQueue.length; i++) {
                 var tr = this.tblPCB.insertRow();

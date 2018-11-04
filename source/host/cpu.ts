@@ -67,12 +67,14 @@ module TSOS {
 
         public terminateProgram(): void {
             //set status to terminated and update block
-            this.program.updateValues("Terminated",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            console.log("Before: " + this.program.status);
+            this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            console.log("After: " + this.program.status);
+
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
             //mark isExecuting as false
             this.isExecuting = false;
-
         }
 
         public terminateOS(): void {
@@ -298,7 +300,7 @@ module TSOS {
             }
             //update CPU and PCB
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            this.program.updateValues("Running",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            this.program.updateValues(this.program.status,this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB();
 
         }

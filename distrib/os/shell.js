@@ -427,7 +427,7 @@ var TSOS;
             var validPID = false;
             //if the arg matches a process id that's in the ready queue and it hasn't been run yet, set to valid
             for (var i = 0; i < _Kernel.readyQueue.length; i++) {
-                console.log("Stat: " + _Kernel.readyQueue[i].status);
+                console.log("Stat " + _Kernel.readyQueue[i].processId + ": " + _Kernel.readyQueue[i].status);
                 if (_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status == "Ready")
                     validPID = true;
             }
