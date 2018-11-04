@@ -36,6 +36,7 @@ var TSOS;
             this.isExecuting = isExecuting;
             this.runningPID = 0;
             this.singleStep = false;
+            this.quantum = 6;
         }
         Cpu.prototype.init = function () {
             this.position = 0;
@@ -55,6 +56,13 @@ var TSOS;
             this.program = _Kernel.readyQueue[this.runningPID];
             //update status to running
             this.program.status = "Running";
+            //update turnaround time for all programs in ready queue
+            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
+                _Kernel.readyQueue[i].turnaroundTime++;
+                if (_Kernel.readyQueue[i].status != "Running") {
+                    _Kernel.readyQueue[i].waitTime++;
+                }
+            }
             //send input to opCodes to check what actions need to be performed
             _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.position));
             //update PCB
@@ -63,6 +71,14 @@ var TSOS;
             }
         };
         Cpu.prototype.terminateProgram = function () {
+            //print turnaround time and wait time
+            _StdOut.advanceLine();
+            _StdOut.putText("Turnaround time: " + this.program.turnaroundTime);
+            _StdOut.advanceLine();
+            _StdOut.putText("Wait time: " + this.program.waitTime);
+            _StdOut.advanceLine();
+            //put prompt back
+            _OsShell.putPrompt();
             //set status to terminated and update block
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.clearPCB();

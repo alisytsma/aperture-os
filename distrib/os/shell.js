@@ -83,6 +83,9 @@ var TSOS;
             // kill
             sc = new TSOS.ShellCommand(this.kill, "kill", "<integer> - kill process specified by process ID");
             this.commandList[this.commandList.length] = sc;
+            // quantum
+            sc = new TSOS.ShellCommand(this.quantum, "quantum", "<integer> - let the user set the Round Robin quantum");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -483,6 +486,10 @@ var TSOS;
         Shell.prototype.kill = function (args) {
             _CPU.program = _Kernel.readyQueue[args];
             _CPU.terminateProgram();
+        };
+        //set quantum
+        Shell.prototype.quantum = function (args) {
+            _CPU.quantum = args;
         };
         return Shell;
     }());

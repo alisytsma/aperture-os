@@ -144,6 +144,12 @@ module TSOS {
                 "<integer> - kill process specified by process ID");
             this.commandList[this.commandList.length] = sc;
 
+            // quantum
+            sc = new ShellCommand(this.quantum,
+                "quantum",
+                "<integer> - let the user set the Round Robin quantum");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -565,6 +571,11 @@ module TSOS {
         public kill(args){
             _CPU.program = _Kernel.readyQueue[args];
             _CPU.terminateProgram();
+        }
+
+        //set quantum
+        public quantum(args){
+            _CPU.quantum = args;
         }
     }
 }
