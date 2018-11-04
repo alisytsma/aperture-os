@@ -108,8 +108,8 @@ module TSOS {
                     "00","00","00","00","00","00","00","00",
                     "00","00","00","00","00","00","00","00"]
         ];
-        public memArrayPosition = 0;
-        public memArraySegment = 0;
+
+        //booleans that check if mem partition is free
         public mem0Free = true;
         public mem1Free = true;
         public mem2Free = true;

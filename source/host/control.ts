@@ -32,6 +32,7 @@ module TSOS {
     export class Control {
         public static tbl = document.createElement('table');
         public static tblPCB = document.createElement('table');
+        public static memArrayPosition = 0;
 
 
         public static hostInit(): void {
@@ -200,16 +201,16 @@ module TSOS {
                         //if not first in column
                         else {
                             //add memory value to cell
-                            td.appendChild(document.createTextNode(_Memory.memArray[p][_Memory.memArrayPosition]));
+                            td.appendChild(document.createTextNode(_Memory.memArray[p][this.memArrayPosition]));
 
                             //increment row count
-                            _Memory.memArrayPosition++;
+                            this.memArrayPosition++;
                         }
                     }
                     //increment column header by 8
                     memNum += 8;
                 }
-                _Memory.memArrayPosition = 0;
+                this.memArrayPosition = 0;
             }
             //add to page
             tableDiv.appendChild(this.tbl);
@@ -217,7 +218,7 @@ module TSOS {
             document.getElementById("tableMemory").style.height = '100px';
             document.getElementById("tableMemory").style.overflow = 'auto';
             //reset counters to 0
-            _Memory.memArrayPosition = 0;
+            this.memArrayPosition = 0;
         }
 
         public static updatePCB(): void {

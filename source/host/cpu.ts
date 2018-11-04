@@ -68,6 +68,7 @@ module TSOS {
         public terminateProgram(): void {
             //set status to terminated and update block
             this.program.updateValues("Terminated",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
             //mark isExecuting as false
             this.isExecuting = false;
@@ -122,7 +123,6 @@ module TSOS {
 
                 //8D - store acc in mem, 2 arg
                 case "8D":
-                    console.log("Segment: " + _Memory.memArraySegment)
                     this.IR = "8D";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -253,7 +253,6 @@ module TSOS {
                 //EE - increment the value of a byte, 2 args
                 case "EE":
                     this.IR = "EE";
-
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
                     arg = parseInt(addr, 16);
@@ -297,6 +296,7 @@ module TSOS {
                     this.position++;
                     break;
             }
+            //update CPU and PCB
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             this.program.updateValues("Running",this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB();

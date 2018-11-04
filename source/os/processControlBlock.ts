@@ -44,6 +44,7 @@ module TSOS {
             this.waitTime = 0;
         }
 
+        //update the values within the process control block
         public updateValues(status: string, pc: number, acc: string, ir: string, xreg: string, yreg: string, zflag: string):void{
             this.status = status;
             this.position = pc;

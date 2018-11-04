@@ -65,6 +65,7 @@ var TSOS;
         Cpu.prototype.terminateProgram = function () {
             //set status to terminated and update block
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
             //mark isExecuting as false
             this.isExecuting = false;
@@ -111,7 +112,6 @@ var TSOS;
                     break;
                 //8D - store acc in mem, 2 arg
                 case "8D":
-                    console.log("Segment: " + _Memory.memArraySegment);
                     this.IR = "8D";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.position + 2) + TSOS.MemoryAccessor.readMemory(this.position + 1));
@@ -263,6 +263,7 @@ var TSOS;
                     this.position++;
                     break;
             }
+            //update CPU and PCB
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             this.program.updateValues("Running", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.updatePCB();

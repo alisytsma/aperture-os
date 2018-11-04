@@ -488,7 +488,6 @@ module TSOS {
                     _Kernel.createProcess(_OsShell.pidCount);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.MemoryManager.updateMemory(input.toString());
-                    //_Memory.memArraySegment++;
                 }
             }
         }
@@ -501,14 +500,20 @@ module TSOS {
         //run a program
         public run(args){
             var validPID = false;
-            //console.log("PID: " + _OsShell.pidCount);
+            //if the arg matches a process id that's in the ready queue and it hasn't been run yet, set to valid
             for(var i = 0; i < _Kernel.readyQueue.length; i++){
-                if(_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status != "Terminated")
+                console.log("Stat: " + _Kernel.readyQueue[i].status);
+                if(_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status == "Ready")
                     validPID = true;
             }
 
+            //if valid
             if(validPID) {
+                //set running pid to args
                 _CPU.runningPID = args;
+                //set program equal to the one we're running
+                _CPU.program = _Kernel.readyQueue[args];
+                //reset CPU
                 _CPU.position = 0;
                 _CPU.Acc = "0";
                 _CPU.IR = "0";
@@ -517,6 +522,7 @@ module TSOS {
                 _CPU.Zflag = "0";
                 _CPU.isExecuting = false;
                 TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+                //disable single step
                 if(_CPU.singleStep == false)
                     _CPU.isExecuting = true;
             } else {
@@ -524,12 +530,15 @@ module TSOS {
             }
         }
 
-        //clear all memory partition
+        //clear all memory partitions
         public clearmem(){
+            //mark all as free
             _Memory.mem0Free = true;
             _Memory.mem1Free = true;
             _Memory.mem2Free = true;
+            //clear memory
             TSOS.MemoryAccessor.clearMem();
+            //clear table and reload it
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
         }

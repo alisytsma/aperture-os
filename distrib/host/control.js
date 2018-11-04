@@ -166,15 +166,15 @@ var TSOS;
                         //if not first in column
                         else {
                             //add memory value to cell
-                            td.appendChild(document.createTextNode(_Memory.memArray[p][_Memory.memArrayPosition]));
+                            td.appendChild(document.createTextNode(_Memory.memArray[p][this.memArrayPosition]));
                             //increment row count
-                            _Memory.memArrayPosition++;
+                            this.memArrayPosition++;
                         }
                     }
                     //increment column header by 8
                     memNum += 8;
                 }
-                _Memory.memArrayPosition = 0;
+                this.memArrayPosition = 0;
             }
             //add to page
             tableDiv.appendChild(this.tbl);
@@ -182,7 +182,7 @@ var TSOS;
             document.getElementById("tableMemory").style.height = '100px';
             document.getElementById("tableMemory").style.overflow = 'auto';
             //reset counters to 0
-            _Memory.memArrayPosition = 0;
+            this.memArrayPosition = 0;
         };
         Control.updatePCB = function () {
             this.clearPCB();
@@ -274,6 +274,7 @@ var TSOS;
         };
         Control.tbl = document.createElement('table');
         Control.tblPCB = document.createElement('table');
+        Control.memArrayPosition = 0;
         return Control;
     }());
     TSOS.Control = Control;

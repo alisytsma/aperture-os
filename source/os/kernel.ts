@@ -176,14 +176,15 @@ module TSOS {
         // - CloseFile
 
         public createProcess(pid: number){
+            //create a new process
             var newProc = new ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
-            //console.log("Create Process: " + TSOS.MemoryManager.allocateMemory());
+            //add it to the ready queue
             this.readyQueue.push(newProc);
+            //update the PCB table
             TSOS.Control.updatePCB();
-
-            for(var i = 0; i < this.readyQueue.length; i++)
-                console.log(this.readyQueue[i].processId);
+            //set the current program to the new process
             _CPU.program = newProc;
+            //initialize
             newProc.init();
         }
 

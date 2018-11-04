@@ -49,6 +49,7 @@ var TSOS;
             this.turnaroundTime = 0;
             this.waitTime = 0;
         };
+        //update the values within the process control block
         ProcessControlBlock.prototype.updateValues = function (status, pc, acc, ir, xreg, yreg, zflag) {
             this.status = status;
             this.position = pc;
