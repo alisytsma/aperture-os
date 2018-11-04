@@ -64,9 +64,7 @@ var TSOS;
         };
         Cpu.prototype.terminateProgram = function () {
             //set status to terminated and update block
-            console.log("Before: " + this.program.status);
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
-            console.log("After: " + this.program.status);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
             //mark isExecuting as false

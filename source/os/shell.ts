@@ -131,7 +131,17 @@ module TSOS {
             // clearmem
             sc = new ShellCommand(this.clearmem,
                 "clearmem",
-                "Clear all partition ");
+                " - Clear all partitions of memory");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new ShellCommand(this.ps,
+                "ps",
+                " - Display current processes in the ready queue and their status");
+            this.commandList[this.commandList.length] = sc;
+            // kill
+            sc = new ShellCommand(this.kill,
+                "kill",
+                "<integer> - kill process specified by process ID");
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -541,6 +551,20 @@ module TSOS {
             //clear table and reload it
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
+        }
+
+        //display processes in ready queue and their status
+        public ps(){
+            for(var i = 0; i < _Kernel.readyQueue.length; i++){
+                _StdOut.putText("Process " + _Kernel.readyQueue[i].processId + " is " + _Kernel.readyQueue[i].status);
+                _StdOut.advanceLine();
+            }
+        }
+
+        //kill a process
+        public kill(args){
+            _CPU.program = _Kernel.readyQueue[args];
+            _CPU.terminateProgram();
         }
     }
 }

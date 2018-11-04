@@ -189,7 +189,6 @@ var TSOS;
             //find table div and set id
             var divPCB = document.getElementById("divPCB");
             this.tblPCB.setAttribute("id", "tablePCB");
-            //set equal to number that memory column header should be equal to
             //loop through for the length of the ready queue to get PCB count
             for (var i = 0; i <= _Kernel.readyQueue.length; i++) {
                 var tr = this.tblPCB.insertRow();
@@ -226,32 +225,34 @@ var TSOS;
                         }
                     }
                     else {
-                        //add values to cell
-                        switch (j) {
-                            case 0:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].processId));
-                                break;
-                            case 1:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].status));
-                                break;
-                            case 2:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].position));
-                                break;
-                            case 3:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].IR));
-                                break;
-                            case 4:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Acc));
-                                break;
-                            case 5:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Xreg));
-                                break;
-                            case 6:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Yreg));
-                                break;
-                            case 7:
-                                td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Zflag));
-                                break;
+                        if (_Kernel.readyQueue[i - 1].status != "Terminated") {
+                            //add appropriate values to cell
+                            switch (j) {
+                                case 0:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].processId));
+                                    break;
+                                case 1:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].status));
+                                    break;
+                                case 2:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].position));
+                                    break;
+                                case 3:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].IR));
+                                    break;
+                                case 4:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Acc));
+                                    break;
+                                case 5:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Xreg));
+                                    break;
+                                case 6:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Yreg));
+                                    break;
+                                case 7:
+                                    td.appendChild(document.createTextNode(_Kernel.readyQueue[i - 1].Zflag));
+                                    break;
+                            }
                         }
                     }
                 }

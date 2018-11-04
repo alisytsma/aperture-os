@@ -75,7 +75,13 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.run, "run", "<integer> - Run a command by process id.");
             this.commandList[this.commandList.length] = sc;
             // clearmem
-            sc = new TSOS.ShellCommand(this.clearmem, "clearmem", "Clear all partition ");
+            sc = new TSOS.ShellCommand(this.clearmem, "clearmem", " - Clear all partitions of memory");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new TSOS.ShellCommand(this.ps, "ps", " - Display current processes in the ready queue and their status");
+            this.commandList[this.commandList.length] = sc;
+            // kill
+            sc = new TSOS.ShellCommand(this.kill, "kill", "<integer> - kill process specified by process ID");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -465,6 +471,18 @@ var TSOS;
             //clear table and reload it
             TSOS.Control.clearTable();
             TSOS.Control.loadTable();
+        };
+        //display processes in ready queue and their status
+        Shell.prototype.ps = function () {
+            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
+                _StdOut.putText("Process " + _Kernel.readyQueue[i].processId + " is " + _Kernel.readyQueue[i].status);
+                _StdOut.advanceLine();
+            }
+        };
+        //kill a process
+        Shell.prototype.kill = function (args) {
+            _CPU.program = _Kernel.readyQueue[args];
+            _CPU.terminateProgram();
         };
         return Shell;
     }());
