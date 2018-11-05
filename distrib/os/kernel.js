@@ -21,6 +21,7 @@ var TSOS;
     var Kernel = /** @class */ (function () {
         function Kernel() {
             this.readyQueue = [];
+            this.runningQueue = [];
         }
         //
         // OS Startup and Shutdown Routines

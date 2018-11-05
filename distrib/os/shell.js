@@ -86,9 +86,9 @@ var TSOS;
             // quantum
             sc = new TSOS.ShellCommand(this.quantum, "quantum", "<integer> - let the user set the Round Robin quantum");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
-            //
+            // run all
+            sc = new TSOS.ShellCommand(this.runAll, "runall", " - run all ready programs");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -446,6 +446,8 @@ var TSOS;
                 _CPU.runningPID = args;
                 //set program equal to the one we're running
                 _CPU.program = _Kernel.readyQueue[args];
+                //add to running queue
+                _Kernel.runningQueue.push(_CPU.program);
                 //reset CPU
                 _CPU.position = 0;
                 _CPU.Acc = "0";
@@ -490,6 +492,17 @@ var TSOS;
         //set quantum
         Shell.prototype.quantum = function (args) {
             _CPU.quantum = args;
+        };
+        //run all programs
+        Shell.prototype.runAll = function () {
+            //add to running queue
+            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
+                _Kernel.runningQueue.push(_Kernel.readyQueue[i]);
+            }
+            //set running pid to args
+            _CPU.runningPID = _Kernel.runningQueue[0].processId;
+            //set program equal to the one we're running
+            _CPU.program = _Kernel.readyQueue[0];
         };
         return Shell;
     }());

@@ -2,6 +2,8 @@
 ///<reference path="../host/control.ts" />
 ///<reference path="../host/memoryAccessor.ts" />
 ///<reference path="../os/memoryManager.ts" />
+///<reference path="../os/scheduler.ts" />
+
 
 /* ------------
      CPU.ts
@@ -53,6 +55,7 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
 
+            TSOS.Scheduler.roundRobin();
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             this.program = _Kernel.readyQueue[this.runningPID];
@@ -262,7 +265,7 @@ module TSOS {
                         }
                         //add 2 to the position and add in the new location
                         this.position = newLocation + 2;
-                    //otherwise, just move up two
+                        //otherwise, just move up two
                     } else {
                         this.position += 2;
                     }
