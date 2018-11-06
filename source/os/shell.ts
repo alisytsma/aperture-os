@@ -519,6 +519,7 @@ module TSOS {
 
         //run a program
         public run(args){
+            _CPU.scheduling = false;
             var validPID = false;
             //if the arg matches a process id that's in the ready queue and it hasn't been run yet, set to valid
             for(var i = 0; i < _Kernel.readyQueue.length; i++){
@@ -586,6 +587,8 @@ module TSOS {
 
         //run all programs
         public runAll(){
+            _CPU.scheduling = true;
+
             //add to running queue
             console.log("B - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
