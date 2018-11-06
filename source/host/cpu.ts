@@ -86,11 +86,12 @@ module TSOS {
             //put prompt back
             _OsShell.putPrompt();
 
-
             //set status to terminated and update block
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
+
+            _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1)
 
             if(_Kernel.runningQueue.length == 0){
                 this.terminateOS();

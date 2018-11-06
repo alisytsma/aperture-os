@@ -21,13 +21,16 @@ module TSOS {
                 for(this.i = 0; this.i < _CPU.quantum; this.i++){
                     _CPU.cycle();
                 }
-                _CPU.program.status = "Ready";
-                console.log("Length: " + _Kernel.runningQueue.length + " +1:" + (parseInt(_CPU.program.processId) + 1));
-                if(_Kernel.runningQueue.length > parseInt(_CPU.program.processId) + 1) {
+                if(_Kernel.runningQueue.length < 1){
+                    break;
+                }
+                if (_Kernel.runningQueue.length > parseInt(_CPU.program.processId) + 1) {
+                    _CPU.program.status = "Ready";
                     _CPU.program = _Kernel.readyQueue[parseInt(_CPU.program.processId) + 1];
-                } else if(_Kernel.runningQueue.length >= 1){
+                } else {
                     _CPU.program = _Kernel.readyQueue[_Kernel.runningQueue[0].processId];
                 }
+
                 if(_CPU.program.position >= TSOS.MemoryAccessor.memoryLength()){
                     _CPU.terminateProgram();
                 }
