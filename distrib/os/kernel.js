@@ -92,12 +92,14 @@ var TSOS;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
-            else if (_CPU.isExecuting && _CPU.singleStep == false) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
+            else if (_CPU.isExecuting && _CPU.singleStep == false && _CPU.scheduling == false) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 _CPU.cycle();
             }
             else { // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
+            if (_CPU.scheduling == true)
+                TSOS.Scheduler.roundRobin();
         };
         //
         // Interrupt Handling

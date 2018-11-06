@@ -595,6 +595,7 @@ module TSOS {
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running
             _CPU.program = _Kernel.readyQueue[0];
+            /*
             //reset CPU
             _CPU.position = 0;
             _CPU.Acc = "0";
@@ -607,7 +608,12 @@ module TSOS {
             //disable single step
             if(_CPU.singleStep == false)
                 _CPU.isExecuting = true;
-            TSOS.Scheduler.roundRobin();
+            if(_CPU.scheduling == true)
+                TSOS.Scheduler.roundRobin();*/
+            //disable single step
+            if(_CPU.singleStep == false)
+                _CPU.isExecuting = true;
+
 
         }
     }

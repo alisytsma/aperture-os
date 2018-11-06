@@ -503,6 +503,7 @@ var TSOS;
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running
             _CPU.program = _Kernel.readyQueue[0];
+            /*
             //reset CPU
             _CPU.position = 0;
             _CPU.Acc = "0";
@@ -513,9 +514,13 @@ var TSOS;
             _CPU.isExecuting = false;
             TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
             //disable single step
+            if(_CPU.singleStep == false)
+                _CPU.isExecuting = true;
+            if(_CPU.scheduling == true)
+                TSOS.Scheduler.roundRobin();*/
+            //disable single step
             if (_CPU.singleStep == false)
                 _CPU.isExecuting = true;
-            TSOS.Scheduler.roundRobin();
         };
         return Shell;
     }());

@@ -28,6 +28,7 @@ module TSOS {
         public program;
         public singleStep = false;
         public quantum = 6;
+        public scheduling = true;
 
         constructor(public position: number = 0,
                     public Acc: string = "0",
@@ -53,8 +54,8 @@ module TSOS {
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
-            console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
-
+            //console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
+          //  this.program = _Kernel.readyQueue[this.runningPID];
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
            // this.program = _Kernel.readyQueue[this.runningPID];
@@ -91,7 +92,16 @@ module TSOS {
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
 
-            _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1)
+            console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
+            _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1);
+
+            if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
+                _CPU.runningPID ++;
+                _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
+            } else if (_Kernel.runningQueue.length >= 1) {
+                _CPU.runningPID = _Kernel.runningQueue[0].processId;
+                _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
+            }
 
             if(_Kernel.runningQueue.length == 0){
                 this.terminateOS();
