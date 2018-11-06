@@ -22,6 +22,7 @@ var TSOS;
         function Kernel() {
             this.readyQueue = [];
             this.runningQueue = [];
+            this.pcbEntries = [];
         }
         //
         // OS Startup and Shutdown Routines

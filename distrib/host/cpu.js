@@ -52,10 +52,9 @@ var TSOS;
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             console.log("Running PID: " + _Kernel.readyQueue[this.runningPID].processId);
-            TSOS.Scheduler.roundRobin();
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.program = _Kernel.readyQueue[this.runningPID];
+            // this.program = _Kernel.readyQueue[this.runningPID];
             //update status to running
             this.program.status = "Running";
             //update turnaround time for all programs in ready queue
@@ -85,10 +84,13 @@ var TSOS;
             this.program.updateValues("Terminated", this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
-            //mark isExecuting as false
-            this.isExecuting = false;
+            if (_Kernel.runningQueue.length == 0) {
+                this.terminateOS();
+            }
         };
         Cpu.prototype.terminateOS = function () {
+            //mark isExecuting as false
+            this.isExecuting = false;
             //mark single step as false
             TSOS.Control.disableSingleStep();
             //set memory back to 0

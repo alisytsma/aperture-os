@@ -496,13 +496,26 @@ var TSOS;
         //run all programs
         Shell.prototype.runAll = function () {
             //add to running queue
-            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
-                _Kernel.runningQueue.push(_Kernel.readyQueue[i]);
-            }
+            console.log("B - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
+            _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
+            console.log("A - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             //set running pid to args
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running
             _CPU.program = _Kernel.readyQueue[0];
+            //reset CPU
+            _CPU.position = 0;
+            _CPU.Acc = "0";
+            _CPU.IR = "0";
+            _CPU.Xreg = "0";
+            _CPU.Yreg = "0";
+            _CPU.Zflag = "0";
+            _CPU.isExecuting = false;
+            TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+            //disable single step
+            if (_CPU.singleStep == false)
+                _CPU.isExecuting = true;
+            TSOS.Scheduler.roundRobin();
         };
         return Shell;
     }());
