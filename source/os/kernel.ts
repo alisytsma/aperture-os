@@ -23,9 +23,10 @@ module TSOS {
 
 
     export class Kernel {
+        //list of programs that are ready and waiting
         public readyQueue = [];
+        //list of programs that are currently being run
         public runningQueue = [];
-        public pcbEntries = [];
 
         //
         // OS Startup and Shutdown Routines
@@ -155,6 +156,9 @@ module TSOS {
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case CONTEXT_SWITCH:
+                    _Scheduler.contextSwitch(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

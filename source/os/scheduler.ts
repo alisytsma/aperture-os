@@ -1,5 +1,6 @@
 ///<reference path="../globals.ts" />
 ///<reference path="../host/control.ts" />
+///<reference path="../os/interrupt.ts" />
 
 
 /* ------------
@@ -21,23 +22,33 @@ module TSOS {
 
                 //loop amount of times set
                 for(this.i = 0; this.i < _CPU.quantum; this.i++){
-                    console.log("Program: " + _CPU.program.processId + " i: " + this.i);
                     _CPU.cycle();
                 }
 
+                //if we can move to the next program, do so
                 if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
+                    //set current program status as ready
                     _CPU.program.status = "Ready";
-                    //find the location of the current process in the running queue, then return that process id + 1
+                    //move to next program
                     _CPU.runningPID ++;
                     _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
-                } else if (_Kernel.runningQueue.length >= 1) {
+                    //context switch interrupt
+                    _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.runningPID));
+
+                } else if (_Kernel.runningQueue.length >= 1) { //otherwise, if there's another program go back to 0
+                    //set current program status as ready
+                    _CPU.program.status = "Ready";
+                    //move to first program
                     _CPU.runningPID = _Kernel.runningQueue[0].processId;
                     _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
+                    //context switch interrupt
+                    _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.runningPID));
                 }
             }
+        }
 
-           //_CPU.terminateOS();
-
+        public contextSwitch(params){
+            _Kernel.krnTrace("Switching to process " + params);
 
         }
 

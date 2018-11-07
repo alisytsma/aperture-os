@@ -20,9 +20,10 @@ var TSOS;
 (function (TSOS) {
     var Kernel = /** @class */ (function () {
         function Kernel() {
+            //list of programs that are ready and waiting
             this.readyQueue = [];
+            //list of programs that are currently being run
             this.runningQueue = [];
-            this.pcbEntries = [];
         }
         //
         // OS Startup and Shutdown Routines
@@ -129,6 +130,9 @@ var TSOS;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case CONTEXT_SWITCH:
+                    _Scheduler.contextSwitch(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
