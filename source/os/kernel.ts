@@ -5,6 +5,8 @@
 ///<reference path="shell.ts" />
 ///<reference path="../host/memory.ts" />
 ///<reference path="processControlBlock.ts" />
+///<reference path="scheduler.ts" />
+
 
 
 /* ------------
@@ -158,7 +160,7 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case CONTEXT_SWITCH:
-                    _Scheduler.contextSwitch(params);
+                    TSOS.Scheduler.contextSwitch(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

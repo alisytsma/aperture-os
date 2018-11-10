@@ -33,7 +33,8 @@ module TSOS {
                     _CPU.runningPID ++;
                     _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
                     //context switch interrupt
-                    _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.runningPID));
+                    if(_CPU.program != null)
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.program.processId));
 
                 } else if (_Kernel.runningQueue.length >= 1) { //otherwise, if there's another program go back to 0
                     //set current program status as ready
@@ -42,12 +43,19 @@ module TSOS {
                     _CPU.runningPID = _Kernel.runningQueue[0].processId;
                     _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
                     //context switch interrupt
-                    _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.runningPID));
+                    if(_CPU.program != null)
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH, _CPU.program.processId));
                 }
+            } else {
+                _CPU.program = _Kernel.runningQueue[0];
+                _CPU.scheduling = false;
+                _CPU.isExecuting = true;
+                _CPU.cycle();
+
             }
         }
 
-        public contextSwitch(params){
+        public static contextSwitch(params){
             _Kernel.krnTrace("Switching to process " + params);
 
         }

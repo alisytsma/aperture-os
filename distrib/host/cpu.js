@@ -58,7 +58,8 @@ var TSOS;
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             // this.program = _Kernel.readyQueue[this.runningPID];
             //update status to running
-            this.program.status = "Running";
+            if (this.program != null)
+                this.program.status = "Running";
             //update turnaround time for all programs in ready queue
             for (var i = 0; i < _Kernel.readyQueue.length; i++) {
                 _Kernel.readyQueue[i].turnaroundTime++;
@@ -66,11 +67,13 @@ var TSOS;
                     _Kernel.readyQueue[i].waitTime++;
                 }
             }
-            //send input to opCodes to check what actions need to be performed
-            _CPU.opCodes(TSOS.MemoryAccessor.readMemory(this.program.position));
-            //update PCB
-            if (this.program.position >= TSOS.MemoryAccessor.memoryLength()) {
-                this.terminateProgram();
+            if (this.program != null) {
+                //send input to opCodes to check what actions need to be performed
+                this.opCodes(TSOS.MemoryAccessor.readMemory(this.program.position));
+                //update PCB
+                if (this.program.position >= TSOS.MemoryAccessor.memoryLength()) {
+                    this.terminateProgram();
+                }
             }
         };
         Cpu.prototype.terminateProgram = function () {
