@@ -156,6 +156,18 @@ module TSOS {
                 " - run all ready programs");
             this.commandList[this.commandList.length] = sc;
 
+            // create file
+            sc = new ShellCommand(this.createFile,
+                "create",
+                "<string> - create file");
+            this.commandList[this.commandList.length] = sc;
+
+            // write file
+            sc = new ShellCommand(this.writeFile,
+                "write",
+                "<string> <string>- write file");
+            this.commandList[this.commandList.length] = sc;
+
 
 
             // Display the initial prompt.
@@ -619,5 +631,56 @@ module TSOS {
 
 
         }
+
+        public createFile(args){
+            var hexInput = [];
+            var input = args[0].toString();
+            for(var i = 0; i < input.length; i++){
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            _StdOut.putText("Created " + hexInput.toString());
+            TSOS.FileSystemDeviceDriver.writeDisk("create", hexInput);
+
+        }
+
+        public readFile(args){
+
+        }
+
+        public writeFile(args){
+
+            console.log(args);
+            var fileName = args[0];
+            args.splice(0,1);
+
+            var input = args.toString();
+
+            var hexInput = [];
+            for(var i = 0; i < input.length; i++){
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            _StdOut.putText(hexInput.toString());
+
+            TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
+
+
+        }
+
+        public format(){
+
+        }
+
+        /*
+        create <filename>	—	Create	the	Gile	"ilename	and	display	a	message	denoting success	or	failure.
+        read <filename>	—	Read	and	display	the	contents	of	"ilename	or
+        display	an	error	if	something	went	wrong.
+        write <filename> “data”	—	Write	the	data	inside	the	quotes	to
+        "ilename	and	display	a	message	denoting	success	or	failure.
+        delete <filename>	—	Remove	"ilename	from	storage	and	display	a
+        message	denoting	success	or	failure.
+        format	—	Initialize	all	blocks	in	all	sectors	in	all	tracks	and	display	a
+        message	denoting	success	or	failure.
+        Add	a	shell	command,	ls,	to	list	the	Giles
+         */
     }
 }

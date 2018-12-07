@@ -88,7 +88,7 @@ var TSOS;
             this.program.updateValues("Terminated", this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
-            console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
+            //console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
             _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1);
             if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
                 _CPU.runningPID++;

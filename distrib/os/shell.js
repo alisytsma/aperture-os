@@ -89,6 +89,12 @@ var TSOS;
             // run all
             sc = new TSOS.ShellCommand(this.runAll, "runall", " - run all ready programs");
             this.commandList[this.commandList.length] = sc;
+            // create file
+            sc = new TSOS.ShellCommand(this.createFile, "create", "<string> - create file");
+            this.commandList[this.commandList.length] = sc;
+            // write file
+            sc = new TSOS.ShellCommand(this.writeFile, "write", "<string> <string>- write file");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -523,6 +529,31 @@ var TSOS;
             //disable single step
             if (_CPU.singleStep == false)
                 _CPU.isExecuting = true;
+        };
+        Shell.prototype.createFile = function (args) {
+            var hexInput = [];
+            var input = args[0].toString();
+            for (var i = 0; i < input.length; i++) {
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            _StdOut.putText("Created " + hexInput.toString());
+            TSOS.FileSystemDeviceDriver.writeDisk("create", hexInput);
+        };
+        Shell.prototype.readFile = function (args) {
+        };
+        Shell.prototype.writeFile = function (args) {
+            console.log(args);
+            var fileName = args[0];
+            args.splice(0, 1);
+            var input = args.toString();
+            var hexInput = [];
+            for (var i = 0; i < input.length; i++) {
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            _StdOut.putText(hexInput.toString());
+            TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
+        };
+        Shell.prototype.format = function () {
         };
         return Shell;
     }());

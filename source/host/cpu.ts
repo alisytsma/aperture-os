@@ -94,7 +94,7 @@ module TSOS {
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
 
-            console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
+            //console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
             _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1);
 
             if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {

@@ -137,21 +137,25 @@ var TSOS;
             for (var p = 0; p < 4; p++) {
                 //loop through 32 times to create 32 rows
                 for (var i = 0; i < 8; i++) {
-                    var tr = this.tblDisk.insertRow();
                     //create 9 columns in those rows
                     for (var j = 0; j < 8; j++) {
-                        var td = tr.insertCell();
-                        //add memory value to cell
-                        td.appendChild(document.createTextNode(TSOS.FileSystemDeviceDriver.diskData[p][i][j]));
-                        console.log("Appending: " + TSOS.FileSystemDeviceDriver.diskData[p][i][j]);
+                        var tr = this.tblDisk.insertRow();
+                        for (var s = 0; s < 64; s++) {
+                            var td = tr.insertCell();
+                            if (s == 0) {
+                                //console.log(p.toString() + "," + i.toString() + "," + j.toString());
+                                td.appendChild(document.createTextNode(p.toString() + ", " + i.toString() + ", " + j.toString()));
+                            }
+                            else {
+                                //add memory value to cell
+                                td.appendChild(document.createTextNode(TSOS.FileSystemDeviceDriver.diskData[p][i][j][s]));
+                            }
+                        }
                     }
                 }
             }
             //add to page
             divDisk.appendChild(this.tblDisk);
-            //set height and overflow of memory table
-            document.getElementById("tableDisk").style.height = '100px';
-            document.getElementById("tableDisk").style.overflow = 'auto';
         };
         //function to clear the memory table
         Control.clearTable = function () {

@@ -39,8 +39,8 @@
 
     <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
-   <!-- Uncomment the line below to enable GLaDOS testing.-->
-   <script type="text/javascript" src="test/glados-ip3.js"></script>
+   <!-- Uncomment the line below to enable GLaDOS testing.
+   <script type="text/javascript" src="test/glados-ip3.js"></script> -->
    
 </head>
 
@@ -128,7 +128,10 @@
          ></textarea>
       </label>
    </div>
-    <div id="divCpu" style="margin-left:520px;">
+    <div id="divMemory" style="float:left; padding: 10px;">
+        <label>Memory</label>
+    </div>
+    <div id="divCpu" style="float:left; padding: 10px;">
         <label>
             CPU
             <br>
@@ -152,14 +155,12 @@
             </table>
         </label>
     </div>
-    <div id="divPCB" style="margin-left:520px;">
+    <div id="divPCB" style="float:left; padding: 10px;">
         <label>Process Control Block</label>
     </div>
-    <div id="divDisk" style="margin-left:520px;">
+
+    <div id="divDisk" style="float:left;">
         <label>Disk</label>
-    </div>
-    <div id="divMemory" style="margin-left:520px;">
-        <label>Memory</label>
     </div>
 </div>
 

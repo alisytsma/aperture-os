@@ -47,13 +47,21 @@ h3 {
   text-align: center;
 }
 
-table {
+#tableMemory, #tablePCB, #tableCpu {
   padding: 10px;
   overflow:auto;
   background-color:white;
-  width:400px;
 }
-table td {
-  /*width: 75px;*/
+#tableMemory td, #tablePCB td, #tableCpu td {
   text-align: center;
+}
+
+#tableDisk {
+  cellspacing:0px;
+  cellpadding:0px;
+  background-color: white;
+}
+
+td {
+  width: 10%;
 }
