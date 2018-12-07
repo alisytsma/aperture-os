@@ -12,6 +12,7 @@ module TSOS {
 
     export class FileSystemDeviceDriver extends DeviceDriver {
 
+        public static diskData = new Array(4);
 
 
         constructor(){
@@ -36,15 +37,14 @@ module TSOS {
             8 blocks - array
              */
 
-            var diskData = new Array(4);
             // create 2D
-            for (var track = 0; track < diskData.length; track++) {
-                diskData[track] = new Array(8);
+            for (var track = 0; track < FileSystemDeviceDriver.diskData.length; track++) {
+                FileSystemDeviceDriver.diskData[track] = new Array(8);
             }
             // create 3D
-            for (var track = 0; track < diskData.length; track++) {
-                for (var sector = 0; sector < diskData[0].length; sector++) {
-                    diskData[track][sector] = new Array(8);
+            for (var track = 0; track < FileSystemDeviceDriver.diskData.length; track++) {
+                for (var sector = 0; sector < FileSystemDeviceDriver.diskData[0].length; sector++) {
+                    FileSystemDeviceDriver.diskData[track][sector] = new Array(8);
                 }
             }
 
@@ -53,12 +53,12 @@ module TSOS {
             for (var track = 0; track < 4; track++) {
                 for (var sector = 0; sector < 8; sector++) {
                     for(var block = 0; block < 8; block++) {
-                        diskData[track][sector][block] = "00";
+                        FileSystemDeviceDriver.diskData[track][sector][block] = "00";
                     }
                 }
             }
 
-            console.log(diskData.toString());
+            console.log(FileSystemDeviceDriver.diskData.toString());
 
         }
 
