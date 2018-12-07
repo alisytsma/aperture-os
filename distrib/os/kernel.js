@@ -2,6 +2,7 @@
 ///<reference path="queue.ts" />
 ///<reference path="../host/control.ts" />
 ///<reference path="deviceDriverKeyboard.ts" />
+///<reference path="fileSystemDeviceDriver.ts" />
 ///<reference path="shell.ts" />
 ///<reference path="../host/memory.ts" />
 ///<reference path="processControlBlock.ts" />
@@ -65,6 +66,10 @@ var TSOS;
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             TSOS.Control.updatePCB();
+            // Load the file system device driver
+            this.krnTrace("Loading the file system device driver.");
+            _krnFileDriver = new TSOS.FileSystemDeviceDriver(); // Construct it.
+            _krnFileDriver.init(); // Call the initialization routine.
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();

@@ -437,7 +437,7 @@ var TSOS;
             var validPID = false;
             //if the arg matches a process id that's in the ready queue and it hasn't been run yet, set to valid
             for (var i = 0; i < _Kernel.readyQueue.length; i++) {
-                console.log("Stat " + _Kernel.readyQueue[i].processId + ": " + _Kernel.readyQueue[i].status);
+                //console.log("Stat " + _Kernel.readyQueue[i].processId + ": "+ _Kernel.readyQueue[i].status);
                 if (_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status == "Ready")
                     validPID = true;
             }
@@ -498,9 +498,9 @@ var TSOS;
         Shell.prototype.runAll = function () {
             _CPU.scheduling = true;
             //add to running queue
-            console.log("B - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
+            //console.log("B - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
-            console.log("A - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
+            //console.log("A - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             //set running pid to args
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running

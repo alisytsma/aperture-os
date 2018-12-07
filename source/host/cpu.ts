@@ -136,7 +136,7 @@ module TSOS {
             var arg;
             var memVal;
 
-            console.log("program: " + this.program.processId + ", input: " + input);
+            //console.log("program: " + this.program.processId + ", input: " + input);
             switch(input){
                 //A9 - load acc with const, 1 arg
                 case "A9":

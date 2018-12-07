@@ -21,11 +21,7 @@ module TSOS {
             //get the current running program
             if(_Kernel.runningQueue.length > 1) {
 
-                //loop amount of times set
-                /* for (this.i = 0; this.cycleCount < _CPU.quantum; this.i++) {
-                     continue;
-                 }*/
-
+                //if cycle count less than quantum
                 if (this.cycleCount >= _CPU.quantum) {
                     //if we can move to the next program, do so
                     if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
@@ -54,9 +50,7 @@ module TSOS {
                     this.cycleCount = 0;
             }
 
-                console.log(this.cycleCount++);
-                this.cycleCount++;
-
+            this.cycleCount++;
 
             }
         }

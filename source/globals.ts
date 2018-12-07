@@ -1,3 +1,5 @@
+///<reference path="./os/console.ts" />
+
 /* ------------
    Globals.ts
 
@@ -66,6 +68,8 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+
+var _krnFileDriver; // = null;
 
 var _hardwareClockID: number = null;
 
