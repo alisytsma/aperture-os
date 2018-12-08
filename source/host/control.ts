@@ -181,11 +181,10 @@ module TSOS {
                         for(var s = 0; s < 64; s++) {
                             var td = tr.insertCell();
                             if(s == 0){
-                                //console.log(p.toString() + "," + i.toString() + "," + j.toString());
                                 td.appendChild(document.createTextNode(p.toString() + ", " + i.toString() + ", " + j.toString()));
                             } else {
                                 //add memory value to cell
-                                td.appendChild(document.createTextNode(TSOS.FileSystemDeviceDriver.diskData[p][i][j][s]));
+                                td.appendChild(document.createTextNode(sessionStorage.getItem(p+","+i+","+j)));
                             }
                         }
                     }

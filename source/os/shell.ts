@@ -651,6 +651,14 @@ module TSOS {
 
             console.log(args);
             var fileName = args[0];
+            var hexName = [];
+            for(var i = 0; i < fileName.length; i++){
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            _StdOut.putText("File: " + hexName.toString());
+
+            TSOS.FileSystemDeviceDriver.findFile(hexName);
+
             args.splice(0,1);
 
             var input = args.toString();
@@ -659,7 +667,7 @@ module TSOS {
             for(var i = 0; i < input.length; i++){
                 hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
             }
-            _StdOut.putText(hexInput.toString());
+            _StdOut.putText("Content: " + hexInput.toString());
 
             TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
 
