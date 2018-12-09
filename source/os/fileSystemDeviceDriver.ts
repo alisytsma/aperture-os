@@ -178,14 +178,29 @@ module TSOS {
                     break;
                 }
             }
-            console.log("Data Until: " + dataUntil);
 
-            for(var j = 4; j <= dataUntil; j++){
-                _StdOut.putText(String.fromCharCode(parseInt(parsedData[j], 16)));
+            if(dataUntil > 4){
+                for(var j = 4; j <= dataUntil; j++){
+                    _StdOut.putText(String.fromCharCode(parseInt(parsedData[j], 16)));
+                }
+            } else {
+                _StdOut.putText("File not found");
             }
 
+        }
 
+        public static deleteDisk(fileName: number[]){
+            FileSystemDeviceDriver.cell.fill("00");
+            var location = TSOS.FileSystemDeviceDriver.findFile(fileName);
+            sessionStorage.setItem("0" + location, JSON.stringify(FileSystemDeviceDriver.cell));
+            sessionStorage.setItem("1" + location, JSON.stringify(FileSystemDeviceDriver.cell));
 
+            console.log("Deleting: 1" + location);
+            console.log("Deleted: " + sessionStorage.getItem("1" + location));
+            _StdOut.putText("File deleted");
+
+            Control.clearDisk();
+            Control.loadDisk();
         }
 
     }

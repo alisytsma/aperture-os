@@ -174,6 +174,12 @@ module TSOS {
                 "<string> - read file");
             this.commandList[this.commandList.length] = sc;
 
+            // delete file
+            sc = new ShellCommand(this.deleteFile,
+                "delete",
+                "<string> - delete file");
+            this.commandList[this.commandList.length] = sc;
+
 
 
             // Display the initial prompt.
@@ -657,7 +663,7 @@ module TSOS {
             }
 
             if(!TSOS.FileSystemDeviceDriver.findFile(hexName)){
-                _StdOut.putText("Cannot find file");
+                _StdOut.putText("File not found");
             } else {
                 TSOS.FileSystemDeviceDriver.readDisk(hexName);
             }
@@ -683,9 +689,24 @@ module TSOS {
             }
 
             if(!TSOS.FileSystemDeviceDriver.findFile(hexName)){
-                _StdOut.putText("Cannot find file");
+                _StdOut.putText("File not found");
             } else {
                 TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
+            }
+        }
+
+        public deleteFile(args){
+
+            var fileName = args[0];
+            var hexName = [];
+            for(var i = 0; i < fileName.length; i++){
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+
+            if(!TSOS.FileSystemDeviceDriver.findFile(hexName)){
+                _StdOut.putText("File not found");
+            } else {
+               TSOS.FileSystemDeviceDriver.deleteDisk(hexName);
             }
         }
 
