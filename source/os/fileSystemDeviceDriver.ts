@@ -110,17 +110,16 @@ module TSOS {
 
             if(FileSystemDeviceDriver.fileBlock < 8) {
                 FileSystemDeviceDriver.fileBlock++;
-            } else {
+                _StdOut.putText("Disk written successfully");
+            } else if (FileSystemDeviceDriver.fileBlock >= 8 && FileSystemDeviceDriver.fileSector < 8){
                 FileSystemDeviceDriver.fileBlock = 0;
                 FileSystemDeviceDriver.fileSector++;
+                _StdOut.putText("Disk written successfully");
+            } else {
+                _StdOut.putText("Disk write failure");
+
             }
 
-            /* if(FileSystemDeviceDriver.blockPointerLocation < 8){
-                FileSystemDeviceDriver.blockPointerLocation++;
-            } else {
-                FileSystemDeviceDriver.blockPointerLocation = 0;
-                FileSystemDeviceDriver.sectorPointerLocation++;
-            }*/
 
             for(var i = 0; i < 2; i++) {
                 for(var j = 0; j < 8; j++){
@@ -130,6 +129,9 @@ module TSOS {
                     }
                 }
             }
+
+            Control.clearDisk();
+            Control.loadDisk();
 
         }
 
@@ -155,15 +157,32 @@ module TSOS {
                             return "," + sector + "," + block;
                         }
 
+                        console.log("sec: " + this.sectorLocation + " block: " + this.blockLocation);
                     }
                 }
             }
-            console.log(found);
+            return false;
         }
 
-        public static readDisk(type: string, fileName: number[]){
+        public static readDisk(fileName: number[]){
 
+            console.log("1," + this.findFile(fileName));
 
+            var retrievedData = sessionStorage.getItem("1" + this.findFile(fileName));
+            var parsedData = JSON.parse(retrievedData);
+            var dataUntil = 5;
+
+            for(var i = 4; i < parsedData.length; i++){
+                if(parsedData[i] == "00"){
+                    dataUntil = i;
+                    break;
+                }
+            }
+            console.log("Data Until: " + dataUntil);
+
+            for(var j = 4; j <= dataUntil; j++){
+                _StdOut.putText(String.fromCharCode(parseInt(parsedData[j], 16)));
+            }
 
 
 

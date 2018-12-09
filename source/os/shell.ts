@@ -168,6 +168,12 @@ module TSOS {
                 "<string> <string>- write file");
             this.commandList[this.commandList.length] = sc;
 
+            // read file
+            sc = new ShellCommand(this.readFile,
+                "read",
+                "<string> - read file");
+            this.commandList[this.commandList.length] = sc;
+
 
 
             // Display the initial prompt.
@@ -638,12 +644,23 @@ module TSOS {
             for(var i = 0; i < input.length; i++){
                 hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
             }
-            _StdOut.putText("Created " + hexInput.toString());
             TSOS.FileSystemDeviceDriver.writeDisk("create", hexInput);
 
         }
 
         public readFile(args){
+
+            var fileName = args[0];
+            var hexName = [];
+            for(var i = 0; i < fileName.length; i++){
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+
+            if(!TSOS.FileSystemDeviceDriver.findFile(hexName)){
+                _StdOut.putText("Cannot find file");
+            } else {
+                TSOS.FileSystemDeviceDriver.readDisk(hexName);
+            }
 
         }
 
@@ -655,9 +672,6 @@ module TSOS {
             for(var i = 0; i < fileName.length; i++){
                 hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
             }
-            _StdOut.putText("File: " + hexName.toString());
-
-            TSOS.FileSystemDeviceDriver.findFile(hexName);
 
             args.splice(0,1);
 
@@ -667,11 +681,12 @@ module TSOS {
             for(var i = 0; i < input.length; i++){
                 hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
             }
-            _StdOut.putText("Content: " + hexInput.toString());
 
-            TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
-
-
+            if(!TSOS.FileSystemDeviceDriver.findFile(hexName)){
+                _StdOut.putText("Cannot find file");
+            } else {
+                TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
+            }
         }
 
         public format(){

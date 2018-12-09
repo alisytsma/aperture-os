@@ -130,6 +130,12 @@ var TSOS;
         Control.hostBtnStep_click = function (btn) {
             _CPU.cycle();
         };
+        Control.clearDisk = function () {
+            var tableDiv = document.getElementById("divDisk");
+            //loop down to delete every row
+            for (var i = this.tblDisk.rows.length - 1; i >= 0; i--)
+                this.tblDisk.deleteRow(i);
+        };
         Control.loadDisk = function () {
             //find table div and set id
             var divDisk = document.getElementById("divDisk");
@@ -140,14 +146,16 @@ var TSOS;
                     //create 9 columns in those rows
                     for (var j = 0; j < 8; j++) {
                         var tr = this.tblDisk.insertRow();
-                        for (var s = 0; s < 64; s++) {
+                        for (var s = 0; s < 2; s++) {
                             var td = tr.insertCell();
                             if (s == 0) {
                                 td.appendChild(document.createTextNode(p.toString() + ", " + i.toString() + ", " + j.toString()));
                             }
-                            else {
-                                //add memory value to cell
-                                td.appendChild(document.createTextNode(sessionStorage.getItem(p + "," + i + "," + j)));
+                            if (s == 1) {
+                                var retrievedData = sessionStorage.getItem(p + "," + i + "," + j);
+                                var parsedData = JSON.parse(retrievedData);
+                                //add disk value to cell
+                                td.appendChild(document.createTextNode(parsedData));
                             }
                         }
                     }
