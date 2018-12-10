@@ -32,6 +32,8 @@ module TSOS {
         //list of programs that are currently being run
         public runningQueue = [];
 
+        public pcbDiskList = [];
+
         //
         // OS Startup and Shutdown Routines
         //
@@ -197,15 +199,19 @@ module TSOS {
         // - WriteFile
         // - CloseFile
 
-        public createProcess(pid: number){
+        public createProcess(pid: number, memory: boolean){
             //create a new process
             var newProc = new ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
             //add it to the ready queue
-            this.readyQueue.push(newProc);
+            if(memory) {
+                this.readyQueue.push(newProc);
+                //set the current program to the new process
+                _CPU.program = newProc;
+            } else {
+                this.pcbDiskList.push(newProc);
+            }
             //update the PCB table
             TSOS.Control.updatePCB();
-            //set the current program to the new process
-            _CPU.program = newProc;
             //initialize
             newProc.init();
         }

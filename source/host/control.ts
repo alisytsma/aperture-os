@@ -334,8 +334,44 @@ module TSOS {
                             }
                         }
                     }
+
+
+
                 }
             }
+        if (_Kernel.pcbDiskList.length >= 1) {
+            var tr = this.tblPCB.insertRow();
+            for (var j = 0; j < 8; j++) {
+                var td = tr.insertCell();
+                    switch (j) {
+                        case 0:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].processId));
+                            break;
+                        case 1:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].status));
+                            break;
+                        case 2:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].position));
+                            break;
+                        case 3:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].IR));
+                            break;
+                        case 4:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].Acc));
+                            break;
+                        case 5:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].Xreg));
+                            break;
+                        case 6:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].Yreg));
+                            break;
+                        case 7:
+                            td.appendChild(document.createTextNode(_Kernel.pcbDiskList[0].Zflag));
+                            break;
+                    }
+                }
+            }
+
             //add to page
             divPCB.appendChild(this.tblPCB);
         }

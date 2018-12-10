@@ -53,6 +53,7 @@ module TSOS {
         }
 
         public cycle(): void {
+
             _Kernel.krnTrace('CPU cycle');
             TSOS.Scheduler.cycleCount++;
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -69,6 +70,7 @@ module TSOS {
                 }
             }
             if(this.program != null) {
+                console.log(this.program.processId);
                 //send input to opCodes to check what actions need to be performed
                 this.opCodes(TSOS.MemoryAccessor.readMemory(this.program.position));
                 //update PCB

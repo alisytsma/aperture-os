@@ -51,7 +51,6 @@ module TSOS {
             if(_Memory.mem0Free ||_Memory.mem1Free ||_Memory.mem2Free){
                 return true;
             } else {
-                _StdOut.putText("Memory full");
                 return false;
             }
         }

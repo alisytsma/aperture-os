@@ -433,9 +433,26 @@ var TSOS;
             if (valid) {
                 if (TSOS.MemoryManager.checkMemory()) {
                     _OsShell.pidCount++;
-                    _Kernel.createProcess(_OsShell.pidCount);
+                    _Kernel.createProcess(_OsShell.pidCount, true);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.MemoryManager.updateMemory(input.toString());
+                }
+                else if (TSOS.FileSystemDeviceDriver.checkDisk(2) && TSOS.FileSystemDeviceDriver.trackFree) {
+                    _OsShell.pidCount++;
+                    _Kernel.createProcess(_OsShell.pidCount, false);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    TSOS.FileSystemDeviceDriver.trackFree = false;
+                    TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 2);
+                }
+                else if (TSOS.FileSystemDeviceDriver.checkDisk(3) && TSOS.FileSystemDeviceDriver.trackFree) {
+                    _OsShell.pidCount++;
+                    _Kernel.createProcess(_OsShell.pidCount, false);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    TSOS.FileSystemDeviceDriver.trackFree = false;
+                    TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 3);
+                }
+                else {
+                    _StdOut.putText("Memory and disk full");
                 }
             }
         };
@@ -510,9 +527,7 @@ var TSOS;
         Shell.prototype.runAll = function () {
             _CPU.scheduling = true;
             //add to running queue
-            //console.log("B - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
-            //console.log("A - Ready length: " + _Kernel.readyQueue.length + ", Running length: " + _Kernel.runningQueue.length);
             //set running pid to args
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running

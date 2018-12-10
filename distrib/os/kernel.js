@@ -26,6 +26,7 @@ var TSOS;
             this.readyQueue = [];
             //list of programs that are currently being run
             this.runningQueue = [];
+            this.pcbDiskList = [];
         }
         //
         // OS Startup and Shutdown Routines
@@ -162,15 +163,20 @@ var TSOS;
         // - ReadFile
         // - WriteFile
         // - CloseFile
-        Kernel.prototype.createProcess = function (pid) {
+        Kernel.prototype.createProcess = function (pid, memory) {
             //create a new process
             var newProc = new TSOS.ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
             //add it to the ready queue
-            this.readyQueue.push(newProc);
+            if (memory) {
+                this.readyQueue.push(newProc);
+                //set the current program to the new process
+                _CPU.program = newProc;
+            }
+            else {
+                this.pcbDiskList.push(newProc);
+            }
             //update the PCB table
             TSOS.Control.updatePCB();
-            //set the current program to the new process
-            _CPU.program = newProc;
             //initialize
             newProc.init();
         };

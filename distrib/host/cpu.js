@@ -67,6 +67,7 @@ var TSOS;
                 }
             }
             if (this.program != null) {
+                console.log(this.program.processId);
                 //send input to opCodes to check what actions need to be performed
                 this.opCodes(TSOS.MemoryAccessor.readMemory(this.program.position));
                 //update PCB

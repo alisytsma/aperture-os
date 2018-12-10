@@ -19,6 +19,7 @@ module TSOS {
         public static blockLocation = 0;
         public static fileSector = 0;
         public static fileBlock = 0;
+        public static trackFree = true;
 
 
         constructor(){
@@ -61,12 +62,6 @@ module TSOS {
                     }
                 }
             }
-
-
-
-
-            //console.log(FileSystemDeviceDriver.diskData.toString());
-
         }
 
         public static writeDisk(type: string, content: number[]){
@@ -125,7 +120,6 @@ module TSOS {
                 for(var j = 0; j < 8; j++){
                     for(var p = 0; p < 8; p++){
                         console.log("Location: " + i + "," + j + "," + p + " Content: " + sessionStorage.getItem((i + "," + j + "," + p)));
-
                     }
                 }
             }
@@ -201,6 +195,51 @@ module TSOS {
 
             Control.clearDisk();
             Control.loadDisk();
+        }
+
+        public static checkDisk(track: number){
+            for(var j = 0; j < 8; j++){
+                for(var p = 0; p < 8; p++){
+                    var retrievedData = sessionStorage.getItem(track + "," + j + "," + p);
+                    var retrievedBlock = JSON.parse(retrievedData);
+                    console.log(retrievedBlock.toString());
+                    for(var i = 0; i < retrievedBlock.length; i++) {
+                        if (retrievedBlock[i] != "00") {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static rollIn(input: string, track: number): void {
+
+            var retrievedData = sessionStorage.getItem(track + ",0,0");
+            var parsedData = JSON.parse(retrievedData);
+
+            var position = 4;
+            for (var i = 0; i < input.length; i++) {
+                if(input.charAt(i) != " ") {
+                    parsedData[position] = input.substring(i, i + 2).toUpperCase();
+                    i += 2;
+                    position++;
+                }
+            }
+
+            sessionStorage.setItem(track.toString() + location, JSON.stringify(parsedData));
+            console.log("Parsed data: " + parsedData.toString());
+
+            console.log(sessionStorage.getItem(track.toString() + location));
+
+            Control.clearDisk();
+            Control.loadDisk();
+
+            _StdOut.putText("Loaded with a PID of " + _OsShell.pidCount);
+        }
+
+        public static rollOut(){
+
         }
 
     }
