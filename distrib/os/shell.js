@@ -5,7 +5,7 @@
 ///<reference path="memoryManager.ts" />
 ///<reference path="../host/control.ts" />
 /* ------------
-   Shell.ts
+   Shell.tss
 
    The OS Shell - The "command line interface" (CLI) for the console.
 
@@ -100,6 +100,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // delete file
             sc = new TSOS.ShellCommand(this.deleteFile, "delete", "<string> - delete file");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new TSOS.ShellCommand(this.ls, "ls", " - list all files");
             this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
@@ -526,27 +529,16 @@ var TSOS;
         //run all programs
         Shell.prototype.runAll = function () {
             _CPU.scheduling = true;
+            console.log("Running queue length: " + _Kernel.runningQueue.length);
             //add to running queue
             _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
+            //if(_Kernel.pcbDiskList.length >= 1)
+            //    _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
+            //console.log("Running queue length: " + _Kernel.runningQueue.length);
             //set running pid to args
             _CPU.runningPID = _Kernel.runningQueue[0].processId;
             //set program equal to the one we're running
             _CPU.program = _Kernel.readyQueue[0];
-            /*
-            //reset CPU
-            _CPU.position = 0;
-            _CPU.Acc = "0";
-            _CPU.IR = "0";
-            _CPU.Xreg = "0";
-            _CPU.Yreg = "0";
-            _CPU.Zflag = "0";
-            _CPU.isExecuting = false;
-            TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
-            //disable single step
-            if(_CPU.singleStep == false)
-                _CPU.isExecuting = true;
-            if(_CPU.scheduling == true)
-                TSOS.Scheduler.roundRobin();*/
             //disable single step
             if (_CPU.singleStep == false)
                 _CPU.isExecuting = true;
@@ -603,6 +595,53 @@ var TSOS;
             }
             else {
                 TSOS.FileSystemDeviceDriver.deleteDisk(hexName);
+            }
+        };
+        Shell.prototype.ls = function () {
+            var fileBuilder = "";
+            var foundFiles = [];
+            var dataUntil = 4;
+            for (var sector = 0; sector < 8; sector++) {
+                for (var block = 0; block < 8; block++) {
+                    for (var cell = 0; cell < 64; cell++) {
+                        var retrievedData = sessionStorage.getItem("0," + sector + "," + block);
+                        var parsedData = JSON.parse(retrievedData);
+                        if (parsedData[cell] == "00") {
+                            dataUntil = cell;
+                        }
+                        if (dataUntil > 4) {
+                            for (var j = 4; j <= dataUntil; j++) {
+                                if (String.fromCharCode(parseInt(parsedData[j], 16)) != "") {
+                                    fileBuilder += String.fromCharCode(parseInt(parsedData[j], 16));
+                                }
+                            }
+                        }
+                        console.log("file builder: " + fileBuilder.trim());
+                        var found = false;
+                        if (fileBuilder != "") {
+                            for (var i = 0; i < foundFiles.length; i++) {
+                                if (fileBuilder.trim() == foundFiles[i].trim()) {
+                                    console.log("if " + fileBuilder.trim() + " = " + foundFiles[i].trim());
+                                    found = true;
+                                    break;
+                                }
+                                console.log("if " + fileBuilder.trim() + " != " + foundFiles[i].trim());
+                            }
+                            if (!found) {
+                                foundFiles.push(fileBuilder.trim());
+                            }
+                        }
+                        fileBuilder = "";
+                    }
+                }
+            }
+            if (foundFiles.length == 0) {
+                _StdOut.putText("No files found");
+            }
+            else {
+                for (var i = 0; i < foundFiles.length; i++) {
+                    _StdOut.putText(foundFiles[i].trim() + " ");
+                }
             }
         };
         Shell.prototype.format = function () {

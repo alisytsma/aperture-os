@@ -240,6 +240,14 @@ module TSOS {
 
         public static rollOut(){
 
+            var toMemory = _Kernel.pcbDiskList[0];
+            var toDisk = _Kernel.readyQueue[0];
+            this.rollIn(toDisk, 3);
+            _Kernel.readyQueue[0] = toMemory;
+
+            Control.clearDisk();
+            Control.loadDisk();
+
         }
 
     }

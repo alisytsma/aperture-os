@@ -62,6 +62,8 @@ module TSOS {
             //update status to running
             if(this.program != null)
              this.program.status = "Running";
+            else if (_Kernel.runningQueue.length > 0)
+                this.program = _Kernel.readyQueue[0];
             //update turnaround time for all programs in ready queue
             for(var i = 0; i < _Kernel.readyQueue.length; i++){
                 _Kernel.readyQueue[i].turnaroundTime++;
