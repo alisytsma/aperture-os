@@ -161,6 +161,7 @@ module TSOS {
         public static readDisk(fileName: number[]){
 
             console.log("1," + this.findFile(fileName));
+            var stringBuilder = "";
 
             var retrievedData = sessionStorage.getItem("1" + this.findFile(fileName));
             var parsedData = JSON.parse(retrievedData);
@@ -174,12 +175,20 @@ module TSOS {
             }
 
             if(dataUntil > 4){
-                for(var j = 4; j <= dataUntil; j++){
-                    _StdOut.putText(String.fromCharCode(parseInt(parsedData[j], 16)));
+                for(var j = 4; j <= dataUntil; j++) {
+                    if (String.fromCharCode(parseInt(parsedData[j], 16)) != "\""){
+                        if (String.fromCharCode(parseInt(parsedData[j], 16)) != ",")
+                            stringBuilder += String.fromCharCode(parseInt(parsedData[j], 16));
+                        else
+                            stringBuilder += " ";
+                    }
+                    console.log("String builder: " + stringBuilder);
                 }
+                _StdOut.putText(stringBuilder);
             } else {
                 _StdOut.putText("File not found");
             }
+
 
         }
 

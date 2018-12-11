@@ -215,9 +215,9 @@ module TSOS {
         // - WriteFile
         // - CloseFile
 
-        public createProcess(pid: number, memory: boolean){
+        public createProcess(pid: number, memory: boolean, priority: number){
             //create a new process
-            var newProc = new ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
+            var newProc = new ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory(), priority);
             //add it to the ready queue
             if(memory) {
                 this.readyQueue.push(newProc);

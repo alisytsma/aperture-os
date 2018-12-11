@@ -521,11 +521,16 @@ module TSOS {
             document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
         }
 
-        public load(){
+        public load(args){
             var input = ((document.getElementById("taProgramInput") as HTMLInputElement).value);
             var valid = true;
+            var priority = 0;
             _StdOut.putText("Loading...");
             _StdOut.advanceLine();
+
+            if(args[0] != null){
+                priority = args[0];
+            }
 
             for(var i = 0; i < input.length; i++) {
                 if(((i + 1) % 3 == 0) && input.charAt(i) != " "){
@@ -548,18 +553,18 @@ module TSOS {
             if(valid) {
                 if(TSOS.MemoryManager.checkMemory()){
                     _OsShell.pidCount++;
-                    _Kernel.createProcess(_OsShell.pidCount, true);
+                    _Kernel.createProcess(_OsShell.pidCount, true, priority);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.MemoryManager.updateMemory(input.toString());
                 } else if(TSOS.FileSystemDeviceDriver.checkDisk(2) && TSOS.FileSystemDeviceDriver.trackFree){
                     _OsShell.pidCount++;
-                    _Kernel.createProcess(_OsShell.pidCount, false);
+                    _Kernel.createProcess(_OsShell.pidCount, false, priority);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.FileSystemDeviceDriver.trackFree = false;
                     TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 2);
                 } else if (TSOS.FileSystemDeviceDriver.checkDisk(3) && TSOS.FileSystemDeviceDriver.trackFree){
                     _OsShell.pidCount++;
-                    _Kernel.createProcess(_OsShell.pidCount, false);
+                    _Kernel.createProcess(_OsShell.pidCount, false, priority);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
                     TSOS.FileSystemDeviceDriver.trackFree = false;
                     TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 3);
@@ -811,19 +816,8 @@ module TSOS {
             Control.clearDisk();
             Control.loadDisk();
 
-        }
+            _StdOut.putText("Disk successfully formatted");
 
-        /*
-        create <filename>	—	Create	the	Gile	"ilename	and	display	a	message	denoting success	or	failure.
-        read <filename>	—	Read	and	display	the	contents	of	"ilename	or
-        display	an	error	if	something	went	wrong.
-        write <filename> “data”	—	Write	the	data	inside	the	quotes	to
-        "ilename	and	display	a	message	denoting	success	or	failure.
-        delete <filename>	—	Remove	"ilename	from	storage	and	display	a
-        message	denoting	success	or	failure.
-        format	—	Initialize	all	blocks	in	all	sectors	in	all	tracks	and	display	a
-        message	denoting	success	or	failure.
-        Add	a	shell	command,	ls,	to	list	the	Giles
-         */
+        }
     }
 }

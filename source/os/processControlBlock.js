@@ -16,7 +16,8 @@
 var TSOS;
 (function (TSOS) {
     var ProcessControlBlock = /** @class */ (function () {
-        function ProcessControlBlock(processId, segment, status, position, Acc, IR, Xreg, Yreg, Zflag, turnaroundTime, waitTime) {
+        function ProcessControlBlock(processId, segment, priority, status, position, Acc, IR, Xreg, Yreg, Zflag, turnaroundTime, waitTime) {
+            if (priority === void 0) { priority = 0; }
             if (status === void 0) { status = "Ready"; }
             if (position === void 0) { position = 0; }
             if (Acc === void 0) { Acc = "0"; }
@@ -28,6 +29,7 @@ var TSOS;
             if (waitTime === void 0) { waitTime = 0; }
             this.processId = processId;
             this.segment = segment;
+            this.priority = priority;
             this.status = status;
             this.position = position;
             this.Acc = Acc;
@@ -48,6 +50,7 @@ var TSOS;
             this.Zflag = "0";
             this.turnaroundTime = 0;
             this.waitTime = 0;
+            this.priority = 0;
         };
         //update the values within the process control block
         ProcessControlBlock.prototype.updateValues = function (status, pc, acc, ir, xreg, yreg, zflag) {

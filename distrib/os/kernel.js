@@ -179,9 +179,9 @@ var TSOS;
         // - ReadFile
         // - WriteFile
         // - CloseFile
-        Kernel.prototype.createProcess = function (pid, memory) {
+        Kernel.prototype.createProcess = function (pid, memory, priority) {
             //create a new process
-            var newProc = new TSOS.ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory());
+            var newProc = new TSOS.ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory(), priority);
             //add it to the ready queue
             if (memory) {
                 this.readyQueue.push(newProc);

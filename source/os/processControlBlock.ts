@@ -21,6 +21,7 @@ module TSOS {
 
         constructor(public processId: string,
                     public segment: number,
+                    public priority: number = 0,
                     public status: string = "Ready",
                     public position: number = 0,
                     public Acc: string = "0",
@@ -42,6 +43,7 @@ module TSOS {
             this.Zflag = "0";
             this.turnaroundTime = 0;
             this.waitTime = 0;
+            this.priority = 0;
         }
 
         //update the values within the process control block
