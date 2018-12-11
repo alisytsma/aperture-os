@@ -131,8 +131,24 @@ module TSOS {
             } else {                      // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
             }
-            if(_CPU.scheduling == true)
-                TSOS.Scheduler.roundRobin();
+            if(_CPU.scheduling == true){
+                if(TSOS.Scheduler.schedulingAlgo == "rr"){
+                    console.log("RR");
+                    TSOS.Scheduler.roundRobin();
+                }
+                else if (TSOS.Scheduler.schedulingAlgo == "fcfs"){
+                    console.log("FCFS");
+                    TSOS.Scheduler.FCFS();
+                }
+                else if (TSOS.Scheduler.schedulingAlgo == "priority"){
+                    TSOS.Scheduler.priority();
+                }
+                else {
+                    _StdOut.putText("No valid algorithm set, defaulting to round robin");
+                    TSOS.Scheduler.schedulingAlgo = "rr";
+                    TSOS.Scheduler.roundRobin();
+                }
+            }
 
 
         }

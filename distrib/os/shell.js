@@ -104,6 +104,12 @@ var TSOS;
             // ls
             sc = new TSOS.ShellCommand(this.ls, "ls", " - list all files");
             this.commandList[this.commandList.length] = sc;
+            // setSchedule
+            sc = new TSOS.ShellCommand(this.setSchedule, "setschedule", "[rr, fcfs, priority] - set scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+            // format
+            sc = new TSOS.ShellCommand(this.format, "format", " - format the disk");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -644,7 +650,23 @@ var TSOS;
                 }
             }
         };
+        Shell.prototype.setSchedule = function (args) {
+            TSOS.Scheduler.schedulingAlgo = args[0];
+            _StdOut.putText("Scheduling algorithm set to " + args[0]);
+            console.log("Scheduling algo: " + TSOS.Scheduler.schedulingAlgo);
+        };
         Shell.prototype.format = function () {
+            TSOS.FileSystemDeviceDriver.cell.fill("00");
+            // populate with 0's
+            for (var track = 0; track < 4; track++) {
+                for (var sector = 0; sector < 8; sector++) {
+                    for (var block = 0; block < 8; block++) {
+                        sessionStorage.setItem(track + "," + sector + "," + block, JSON.stringify(TSOS.FileSystemDeviceDriver.cell));
+                    }
+                }
+            }
+            TSOS.Control.clearDisk();
+            TSOS.Control.loadDisk();
         };
         return Shell;
     }());

@@ -186,6 +186,19 @@ module TSOS {
                 " - list all files");
             this.commandList[this.commandList.length] = sc;
 
+            // setSchedule
+            sc = new ShellCommand(this.setSchedule,
+                "setschedule",
+                "[rr, fcfs, priority] - set scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+
+            // format
+            sc = new ShellCommand(this.format,
+                "format",
+                " - format the disk");
+            this.commandList[this.commandList.length] = sc;
+
+
 
 
             // Display the initial prompt.
@@ -774,7 +787,29 @@ module TSOS {
 
         }
 
+        public setSchedule(args){
+
+            TSOS.Scheduler.schedulingAlgo = args[0];
+            _StdOut.putText("Scheduling algorithm set to " + args[0]);
+            console.log("Scheduling algo: " + TSOS.Scheduler.schedulingAlgo);
+
+        }
+
         public format(){
+
+            FileSystemDeviceDriver.cell.fill("00");
+
+            // populate with 0's
+            for(var track = 0; track < 4; track++) {
+                for (var sector = 0; sector < 8; sector++) {
+                    for (var block = 0; block < 8; block++) {
+                        sessionStorage.setItem(track + "," + sector + "," + block, JSON.stringify(FileSystemDeviceDriver.cell));
+                    }
+                }
+            }
+
+            Control.clearDisk();
+            Control.loadDisk();
 
         }
 

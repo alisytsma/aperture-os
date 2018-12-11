@@ -51,6 +51,7 @@ var TSOS;
             TSOS.Control.updateCPU(this.position, this.Acc, this.IR, this.Xreg, this.Yreg, this.Zflag);
         };
         Cpu.prototype.cycle = function () {
+            console.log("Free mem: " + TSOS.MemoryManager.allocateMemory());
             _Kernel.krnTrace('CPU cycle');
             TSOS.Scheduler.cycleCount++;
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -91,6 +92,15 @@ var TSOS;
             this.program.updateValues("Terminated", this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
             TSOS.Control.clearPCB();
             TSOS.Control.updatePCB();
+            if (_Kernel.runningQueue[_Kernel.runningQueue.indexOf(this.program)].segment == 0) {
+                _Memory.mem0Free = true;
+            }
+            else if (_Kernel.runningQueue[_Kernel.runningQueue.indexOf(this.program)].segment == 1) {
+                _Memory.mem1Free = true;
+            }
+            else if (_Kernel.runningQueue[_Kernel.runningQueue.indexOf(this.program)].segment == 2) {
+                _Memory.mem2Free = true;
+            }
             //console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
             _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1);
             if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
