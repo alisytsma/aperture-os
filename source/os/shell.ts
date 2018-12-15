@@ -650,8 +650,6 @@ module TSOS {
         //run all programs
         public runAll(){
             _CPU.scheduling = true;
-            console.log("Running queue length: " + _Kernel.runningQueue.length);
-
 
             //add to running queue
             _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
@@ -698,7 +696,6 @@ module TSOS {
 
         public writeFile(args){
 
-            console.log(args);
             var fileName = args[0];
             var hexName = [];
             for(var i = 0; i < fileName.length; i++){
@@ -766,11 +763,9 @@ module TSOS {
                         if(fileBuilder != "") {
                             for (var i = 0; i < foundFiles.length; i++) {
                                 if (fileBuilder.trim() == foundFiles[i].trim()) {
-                                    console.log("if " + fileBuilder.trim() + " = " + foundFiles[i].trim());
                                     found = true;
                                     break;
                                 }
-                                console.log("if " + fileBuilder.trim() + " != " + foundFiles[i].trim());
                             }
                             if(!found){
                                 foundFiles.push(fileBuilder.trim());

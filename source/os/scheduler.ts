@@ -16,15 +16,17 @@ module TSOS {
         public static i = 0;
         public static cycleCount = 0;
         public static schedulingAlgo;
-        public static swap = 0;
+        public static programToSwap = 0;
+        public static runCount = 0;
 
         public static roundRobin():void {
 
             //get the current running program
             if(_Kernel.runningQueue.length > 1) {
 
-                //if cycle count less than quantum
+                //if cycle count greater than quantum
                 if (this.cycleCount >= _CPU.quantum) {
+                    this.runCount++;
                     //if we can move to the next program, do so
                     if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
                         //set current program status as ready
@@ -45,72 +47,41 @@ module TSOS {
                         //move to first program
                         if (_Kernel.pcbDiskList.length > 0) {
 
-                            for(var track = 0; track < 4; track++) {
-                                for (var sector = 0; sector < 8; sector++) {
-                                    for (var block = 0; block < 8; block++) {
-                                        console.log("Disk: " + sessionStorage.getItem(track + "," + sector + "," + block));
-                                    }
-                                }
+                            var memSegment;
+
+                            if (_Kernel.readyQueue[this.programToSwap].segment == 0) {
+                                _Memory.mem0Free = true;
+                                memSegment = 0;
+                            }
+                            else if (_Kernel.readyQueue[this.programToSwap].segment == 1) {
+                                _Memory.mem1Free = true;
+                                memSegment = 1;
+                            }
+                            else if (_Kernel.readyQueue[this.programToSwap].segment == 2) {
+                                _Memory.mem2Free = true;
+                                memSegment = 2;
                             }
 
-                            for(var i = 0; i < _Kernel.runningQueue.length; i++)
-                                console.log("Running queue: " + _Kernel.runningQueue[i].processId);
-                            console.log("Disk queue: " + _Kernel.pcbDiskList[0].processId);
+                            _Kernel.readyQueue[this.programToSwap].segment = 99;
 
-                            //if less than 3 processes
-                            if(_Kernel.runningQueue.length < 3){
-                                _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
-                                _Kernel.pcbDiskList.splice(0,1);
-                                _CPU.runningPID = _Kernel.runningQueue[0];
-                            } else {
-                                var toMemory = _Kernel.pcbDiskList[0];
-                                var toDisk = _Memory.memArray[this.swap];
+                            _Kernel.pcbDiskList.push(_Kernel.readyQueue[this.programToSwap]);
 
-                                var track = 0;
-                                if(TSOS.FileSystemDeviceDriver.checkDisk(3)){
-                                    track = 3;
-                                } else if(TSOS.FileSystemDeviceDriver.checkDisk(4)) {
-                                    track = 4;
-                                }
+                            if(TSOS.FileSystemDeviceDriver.checkDisk(2)){
+                                TSOS.FileSystemDeviceDriver.rollIn(_Memory.memArray[memSegment].toString(),2);
+                                TSOS.FileSystemDeviceDriver.rollOut(3, this.programToSwap);
 
-                                if (_Kernel.runningQueue[this.swap].segment == 0) {
-                                    _Memory.mem0Free = true;
-                                    toMemory.segment = 0;
-                                }
-                                else if (_Kernel.runningQueue[this.swap].segment == 1) {
-                                    _Memory.mem1Free = true;
-                                    toMemory.segment = 1;
-                                }
-                                else if (_Kernel.runningQueue[this.swap].segment == 2) {
-                                    _Memory.mem2Free = true;
-                                    toMemory.segment = 2;
-                                }
-
-                                _Kernel.runningQueue[this.swap].segment = 99;
-                                TSOS.FileSystemDeviceDriver.rollIn(toDisk.toString(), track);
-
-
-                                toMemory = sessionStorage.getItem("3,0,0");
-
-                                MemoryManager.updateMemory(toMemory.toString(), _Kernel.pcbDiskList[0].segment);
-
-                                Control.clearTable();
-                                Control.loadTable();
-                                Control.clearDisk();
-                                Control.loadDisk();
-
-                                var temp =_Kernel.runningQueue[this.swap];
-                                _Kernel.runningQueue[this.swap] = _Kernel.pcbDiskList[0];
-                                _Kernel.pcbDiskList[0] = temp;
-
-                                console.log("DISK: " +  _Kernel.pcbDiskList[0].processId + " MEM: " + _Kernel.runningQueue[this.swap].processId);
-
+                            } else if(TSOS.FileSystemDeviceDriver.checkDisk(3)) {
+                                console.log("Roll " + _Kernel.pcbDiskList[1].processId + " into track 3");
+                                TSOS.FileSystemDeviceDriver.rollIn(_Memory.memArray[memSegment].toString(), 3);
+                                TSOS.FileSystemDeviceDriver.rollOut(2, this.programToSwap);
                             }
 
-                            _CPU.runningPID = _Kernel.runningQueue[0];
-                            _CPU.program = _Kernel.readyQueue[_Kernel.runningQueue[0].processId];
+                            _CPU.program = _Kernel.readyQueue[this.programToSwap];
 
 
+                            this.programToSwap++;
+                            if(this.programToSwap > 2)
+                                this.programToSwap = 0;
 
                         } else {
 
@@ -125,10 +96,7 @@ module TSOS {
                         _CPU.program = _Kernel.runningQueue[0];
                     }
                     this.cycleCount = 0;
-            }
-
-            this.cycleCount++;
-
+                }
             }
         }
 
@@ -140,18 +108,23 @@ module TSOS {
                 _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
             }
 
+            // if running queue has data but isn't full and the disk has data, bring the disk data to mem
             if(_Kernel.pcbDiskList.length > 0 && _Kernel.runningQueue.length < 3 && _Kernel.runningQueue.length > 0){
-                TSOS.FileSystemDeviceDriver.rollOut();
+                // if track 2 is the one with data, otherwise track 3
+                if(!TSOS.FileSystemDeviceDriver.checkDisk(2))
+                    TSOS.FileSystemDeviceDriver.rollOut(2, 2);
+                else
+                    TSOS.FileSystemDeviceDriver.rollOut(3, 2);
             }
 
         }
 
         public static priorityAlgo():void {
 
-           _Kernel.runningQueue.sort(function(a, b){
+            //sort the running queue by sort
+            _Kernel.runningQueue.sort(function(a, b){
                 return a.priority-b.priority
             });
-
 
             //get the current running program
             if(_Kernel.runningQueue.length > 0) {
@@ -159,11 +132,14 @@ module TSOS {
                 _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
             }
 
+            // if running queue has data but isn't full and the disk has data, bring the disk data to mem
             if(_Kernel.pcbDiskList.length > 0 && _Kernel.runningQueue.length < 3 && _Kernel.runningQueue.length > 0){
-                TSOS.FileSystemDeviceDriver.rollOut();
+                // if track 2 is the one with data, otherwise track 3
+                if(!TSOS.FileSystemDeviceDriver.checkDisk(2))
+                    TSOS.FileSystemDeviceDriver.rollOut(2, 2);
+                else
+                    TSOS.FileSystemDeviceDriver.rollOut(3, 2);
             }
-
-            console.log("Running program: " + _CPU.program.processId);
 
         }
 

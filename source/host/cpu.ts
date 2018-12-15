@@ -54,9 +54,6 @@ module TSOS {
 
         public cycle(): void {
 
-            console.log("Free mem: " + TSOS.MemoryManager.allocateMemory());
-
-
             _Kernel.krnTrace('CPU cycle');
             TSOS.Scheduler.cycleCount++;
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -75,7 +72,6 @@ module TSOS {
                 }
             }
             if(this.program != null) {
-                console.log(this.program.processId);
                 //send input to opCodes to check what actions need to be performed
                 this.opCodes(TSOS.MemoryAccessor.readMemory(this.program.position));
                 //update PCB
@@ -110,8 +106,9 @@ module TSOS {
                 _Memory.mem2Free = true;
             }
 
-                //console.log("Splice: " + _Kernel.runningQueue.indexOf(this.program));
             _Kernel.runningQueue.splice(_Kernel.runningQueue.indexOf(this.program), 1);
+            var index = _Kernel.readyQueue.indexOf(this.program);
+            _Kernel.readyQueue.splice(_Kernel.readyQueue.indexOf(this.program), 1);
 
             if (_Kernel.runningQueue.length > _CPU.runningPID + 1) {
                 _CPU.runningPID ++;
@@ -124,7 +121,7 @@ module TSOS {
             if(_Kernel.runningQueue.length == 0){
                 this.terminateOS();
             }
-
+            this.program = _Kernel.readyQueue[index];
             console.log("Terminate");
         }
 
@@ -154,7 +151,6 @@ module TSOS {
             var arg;
             var memVal;
 
-            //console.log("program: " + this.program.processId + ", input: " + input);
             switch(input){
                 //A9 - load acc with const, 1 arg
                 case "A9":
@@ -168,8 +164,6 @@ module TSOS {
 
                 //AD - load from mem, 2 arg
                 case "AD":
-                    console.log("Code AD at position " + this.program.position);
-
                     this.program.IR = "AD";
                     //find next 2 codes and swap them to get values for op code
                     addr = (TSOS.MemoryAccessor.readMemory(this.program.position + 2) + TSOS.MemoryAccessor.readMemory(this.program.position + 1));
@@ -354,10 +348,12 @@ module TSOS {
                     this.program.position++;
                     break;
             }
-            //update CPU and PCB
-            TSOS.Control.updateCPU(this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
-            this.program.updateValues(this.program.status,this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
-            TSOS.Control.updatePCB();
+            //update CPU and PCB if not null
+            if(this.program != null) {
+                TSOS.Control.updateCPU(this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
+                this.program.updateValues(this.program.status, this.program.position, this.program.Acc, this.program.IR, this.program.Xreg, this.program.Yreg, this.program.Zflag);
+                TSOS.Control.updatePCB();
+            }
         }
     }
 }

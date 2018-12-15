@@ -144,7 +144,6 @@ module TSOS {
 
         public static readDisk(fileName: number[]){
 
-            console.log("1," + this.findFile(fileName));
             var stringBuilder = "";
 
             var retrievedData = sessionStorage.getItem("1" + this.findFile(fileName));
@@ -166,7 +165,6 @@ module TSOS {
                         else
                             stringBuilder += " ";
                     }
-                    console.log("String builder: " + stringBuilder);
                 }
                 _StdOut.putText(stringBuilder);
             } else {
@@ -177,19 +175,20 @@ module TSOS {
         }
 
         public static deleteDisk(fileName: number[]){
+            // fill location and pointer with 0's
             FileSystemDeviceDriver.cell.fill("00");
             var location = TSOS.FileSystemDeviceDriver.findFile(fileName);
             sessionStorage.setItem("0" + location, JSON.stringify(FileSystemDeviceDriver.cell));
             sessionStorage.setItem("1" + location, JSON.stringify(FileSystemDeviceDriver.cell));
 
-            console.log("Deleting: 1" + location);
-            console.log("Deleted: " + sessionStorage.getItem("1" + location));
             _StdOut.putText("File deleted");
 
+            // update disk
             Control.clearDisk();
             Control.loadDisk();
         }
 
+        // function to check if a track has data or not
         public static checkDisk(track: number){
             for(var j = 0; j < 8; j++){
                 for(var p = 0; p < 8; p++){
@@ -198,58 +197,68 @@ module TSOS {
                     console.log(retrievedBlock.toString());
                     for(var i = 0; i < retrievedBlock.length; i++) {
                         if (retrievedBlock[i] != "00") {
+                            // if there's any data other than 00, not empty
                             return false;
                         }
                     }
                 }
             }
+            // if we make it through the whole track with only 00's, it's empty
             return true;
         }
 
         public static rollIn(input: string, track: number): void {
 
-            console.log("RollIn " + input);
-
+            // get data from disk and parse it
             var retrievedData = sessionStorage.getItem(track + ",0,0");
             var parsedData = JSON.parse(retrievedData);
-
+            // data starts at position 3
             var position = 3;
             for (var i = 0; i < input.length; i++) {
+                // replace the parsed data with the input if it's not a space
                 if(input.charAt(i) != " ") {
                     parsedData[position] = input.substring(i, i + 2).toUpperCase();
                     i += 2;
                     position++;
                 }
             }
-
+            // set the data at the right position
             sessionStorage.setItem(track.toString() + ",0,0", JSON.stringify(parsedData));
 
+            // update disk
             Control.clearDisk();
             Control.loadDisk();
 
-            console.log("Get item: " + sessionStorage.getItem(track.toString() + ",0,0") + "in loc " + track.toString() + ",0,0");
         }
 
-        public static rollOut(){
+        public static rollOut(track: number, replacing: number){
 
+            // set segment of disk pcb equal to first open memory spot
             _Kernel.pcbDiskList[0].segment = TSOS.MemoryManager.allocateMemory();
+
+            console.log("Roll " + _Kernel.pcbDiskList[0].processId + " out into memory segment " + _Kernel.pcbDiskList[0].segment);
+
             var retrievedData;
-            var trackNum;
-            if(this.checkDisk(2)) {
-                retrievedData = sessionStorage.getItem("3,0,0");
-                trackNum = 3;
-            }
-            else {
-                retrievedData = sessionStorage.getItem("2,0,0");
-                trackNum = 2;
-            }
+            retrievedData = sessionStorage.getItem(track + ",0,0");
+            // parse the retrieved data
             var parsedData = JSON.parse(retrievedData);
+            // delete the first 3 bits (pointer)
             parsedData.splice(0,3);
+            // add this data to memory in the right segment
             TSOS.MemoryManager.updateMemory(JSON.stringify(parsedData), _Kernel.pcbDiskList[0].segment);
-            _Kernel.readyQueue.push(_Kernel.pcbDiskList[0]);
-            _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
-            this.formatDisk(trackNum);
+            if(_Kernel.readyQueue.length < 3) {
+                // add to ready and running queues
+                _Kernel.readyQueue.push(_Kernel.pcbDiskList[0]);
+                _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
+            } else {
+                _Kernel.readyQueue[replacing] = _Kernel.pcbDiskList[0];
+                _Kernel.runningQueue[replacing] = _Kernel.pcbDiskList[0];
+            }
+            // clear the disk track
+            this.formatDisk(track);
+            // remove from disk list
             _Kernel.pcbDiskList.splice(0,1);
+            // update disk
             Control.clearDisk();
             Control.loadDisk();
 
@@ -270,6 +279,5 @@ module TSOS {
             Control.loadDisk();
 
         }
-
     }
 }
