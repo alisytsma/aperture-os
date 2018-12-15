@@ -136,61 +136,31 @@ module TSOS {
 
             //get the current running program
             if(_Kernel.runningQueue.length > 0) {
-
                 _CPU.runningPID = _Kernel.runningQueue[0].processId;
                 _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
-
             }
 
             if(_Kernel.pcbDiskList.length > 0 && _Kernel.runningQueue.length < 3 && _Kernel.runningQueue.length > 0){
-
                 TSOS.FileSystemDeviceDriver.rollOut();
-
             }
 
-            //console.log("Running program: " + _CPU.program.processId);
         }
 
         public static priorityAlgo():void {
 
-            var order = [];
-
-            /*
-            for(var i = 0; i < _Kernel.runningQueue.length - 1; i++){
-                if(_Kernel.runningQueue[i].priority > _Kernel.runningQueue[i + 1].priority){
-                    var temp = _Kernel.runningQueue[i];
-                    _Kernel.runningQueue[i] = _Kernel.runningQueue[i + 1];
-                    _Kernel.runningQueue[i + 1] = temp;
-                }
-            }
-
-            _Kernel.runningQueue.sort(_Kernel.runningQueue[i].priority);
-            */
-            console.log(_Kernel.runningQueue.sort(function(a, b){
+           _Kernel.runningQueue.sort(function(a, b){
                 return a.priority-b.priority
-            }));
+            });
 
-            for(var i = 0; i < _Kernel.runningQueue.length; i++){
-                console.log("P order: " + _Kernel.runningQueue[i].processId);
-            }
 
             //get the current running program
             if(_Kernel.runningQueue.length > 0) {
-
                 _CPU.runningPID = _Kernel.runningQueue[0].processId;
                 _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
-
             }
 
-            if(_Kernel.pcbDiskList.length > 0 && _Kernel.runningQueue.length < 3){
-
-                _Kernel.pcbDiskList[0].segment = TSOS.MemoryManager.allocateMemory();
-                _Kernel.readyQueue.push(_Kernel.pcbDiskList[0]);
-                _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
-                _Kernel.pcbDiskList.splice(0,1);
-
-
-
+            if(_Kernel.pcbDiskList.length > 0 && _Kernel.runningQueue.length < 3 && _Kernel.runningQueue.length > 0){
+                TSOS.FileSystemDeviceDriver.rollOut();
             }
 
             console.log("Running program: " + _CPU.program.processId);

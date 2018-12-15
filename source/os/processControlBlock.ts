@@ -43,7 +43,6 @@ module TSOS {
             this.Zflag = "0";
             this.turnaroundTime = 0;
             this.waitTime = 0;
-            this.priority = 0;
         }
 
         //update the values within the process control block
