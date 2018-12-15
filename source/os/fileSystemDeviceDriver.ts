@@ -18,7 +18,7 @@ module TSOS {
         public static sectorLocation = 0;
         public static blockLocation = 0;
         public static fileSector = 0;
-        public static fileBlock = 0;
+        public static fileBlock = 1;
         public static trackFree = true;
 
 
@@ -35,22 +35,6 @@ module TSOS {
         }
 
         public init(){
-
-            /* 4 tracks
-            8 sectors
-            8 blocks - array
-
-            // create 2D
-            for (var sector = 0; sector < FileSystemDeviceDriver.diskData.length; sector++) {
-                FileSystemDeviceDriver.diskData[sector] = new Array(8);
-            }
-
-            // create 3D
-            for (var sector = 0; sector < FileSystemDeviceDriver.diskData[0].length; sector++) {
-                for (var block = 0; block < FileSystemDeviceDriver.diskData[0].length; block++) {
-                    FileSystemDeviceDriver.diskData[sector][block] = new Array(64);
-                }
-            }*/
 
             FileSystemDeviceDriver.cell.fill("00");
 
@@ -224,10 +208,12 @@ module TSOS {
 
         public static rollIn(input: string, track: number): void {
 
+            console.log("RollIn " + input);
+
             var retrievedData = sessionStorage.getItem(track + ",0,0");
             var parsedData = JSON.parse(retrievedData);
 
-            var position = 4;
+            var position = 3;
             for (var i = 0; i < input.length; i++) {
                 if(input.charAt(i) != " ") {
                     parsedData[position] = input.substring(i, i + 2).toUpperCase();
@@ -236,26 +222,49 @@ module TSOS {
                 }
             }
 
-            sessionStorage.setItem(track.toString() + location, JSON.stringify(parsedData));
-            console.log("Parsed data: " + parsedData.toString());
-
-            console.log(sessionStorage.getItem(track.toString() + location));
+            sessionStorage.setItem(track.toString() + ",0,0", JSON.stringify(parsedData));
 
             Control.clearDisk();
             Control.loadDisk();
 
-            _StdOut.putText("Loaded with a PID of " + _OsShell.pidCount);
-
-
-
+            console.log("Get item: " + sessionStorage.getItem(track.toString() + ",0,0") + "in loc " + track.toString() + ",0,0");
         }
 
         public static rollOut(){
 
-            var toMemory = _Kernel.pcbDiskList[0];
-            var toDisk = _Kernel.readyQueue[0];
-            this.rollIn(toDisk, 3);
-            _Kernel.readyQueue[0] = toMemory;
+            _Kernel.pcbDiskList[0].segment = TSOS.MemoryManager.allocateMemory();
+            var retrievedData;
+            var trackNum;
+            if(this.checkDisk(2)) {
+                retrievedData = sessionStorage.getItem("3,0,0");
+                trackNum = 3;
+            }
+            else {
+                retrievedData = sessionStorage.getItem("2,0,0");
+                trackNum = 2;
+            }
+            var parsedData = JSON.parse(retrievedData);
+            parsedData.splice(0,3);
+            TSOS.MemoryManager.updateMemory(JSON.stringify(parsedData), _Kernel.pcbDiskList[0].segment);
+            _Kernel.readyQueue.push(_Kernel.pcbDiskList[0]);
+            _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
+            this.formatDisk(trackNum);
+            _Kernel.pcbDiskList.splice(0,1);
+            Control.clearDisk();
+            Control.loadDisk();
+
+        }
+
+        public static formatDisk(track: number){
+
+            FileSystemDeviceDriver.cell.fill("00");
+
+            // populate with 0's
+            for (var sector = 0; sector < 8; sector++) {
+                for (var block = 0; block < 8; block++) {
+                    sessionStorage.setItem(track + "," + sector + "," + block, JSON.stringify(FileSystemDeviceDriver.cell));
+                }
+            }
 
             Control.clearDisk();
             Control.loadDisk();

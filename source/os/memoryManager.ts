@@ -2,7 +2,7 @@
 ///<reference path="../host/control.ts" />
 
 /* ------------
-     MemoryManager.ts
+     MemoryManager.tss
 
      Requires global.ts.
      ------------ */
@@ -14,11 +14,11 @@ module TSOS {
         public static endProgram;
 
         // update memory with new values
-        public static updateMemory(input: string):void {
+        public static updateMemory(input: string, segment: number):void {
             var position = 0;
             for (var i = 0; i < input.length; i++) {
-                if(input.charAt(i) != " ") {
-                    _Memory.memArray[_CPU.program.segment][position] = input.substring(i, i + 2).toUpperCase();
+                if(input.charAt(i) != " " && input.charAt(i) != "\"" && input.charAt(i) != "," && input.charAt(i) != "[" && input.charAt(i) != "]") {
+                    _Memory.memArray[segment][position] = input.substring(i, i + 2).toUpperCase();
                     i += 2;
                     position++;
                 }

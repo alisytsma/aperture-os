@@ -133,15 +133,13 @@ module TSOS {
             }
             if(_CPU.scheduling == true){
                 if(TSOS.Scheduler.schedulingAlgo == "rr"){
-                    console.log("RR");
                     TSOS.Scheduler.roundRobin();
                 }
                 else if (TSOS.Scheduler.schedulingAlgo == "fcfs"){
-                    console.log("FCFS");
                     TSOS.Scheduler.FCFS();
                 }
                 else if (TSOS.Scheduler.schedulingAlgo == "priority"){
-                    TSOS.Scheduler.priority();
+                    TSOS.Scheduler.priorityAlgo();
                 }
                 else {
                     _StdOut.putText("No valid algorithm set, defaulting to round robin");

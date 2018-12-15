@@ -555,7 +555,7 @@ module TSOS {
                     _OsShell.pidCount++;
                     _Kernel.createProcess(_OsShell.pidCount, true, priority);
                     _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
-                    TSOS.MemoryManager.updateMemory(input.toString());
+                    TSOS.MemoryManager.updateMemory(input.toString(), _CPU.program.segment);
                 } else if(TSOS.FileSystemDeviceDriver.checkDisk(2) && TSOS.FileSystemDeviceDriver.trackFree){
                     _OsShell.pidCount++;
                     _Kernel.createProcess(_OsShell.pidCount, false, priority);
@@ -796,25 +796,16 @@ module TSOS {
 
             TSOS.Scheduler.schedulingAlgo = args[0];
             _StdOut.putText("Scheduling algorithm set to " + args[0]);
-            console.log("Scheduling algo: " + TSOS.Scheduler.schedulingAlgo);
 
         }
 
         public format(){
 
-            FileSystemDeviceDriver.cell.fill("00");
+            TSOS.FileSystemDeviceDriver.formatDisk(0);
+            TSOS.FileSystemDeviceDriver.formatDisk(1);
+            TSOS.FileSystemDeviceDriver.formatDisk(2);
+            TSOS.FileSystemDeviceDriver.formatDisk(3);
 
-            // populate with 0's
-            for(var track = 0; track < 4; track++) {
-                for (var sector = 0; sector < 8; sector++) {
-                    for (var block = 0; block < 8; block++) {
-                        sessionStorage.setItem(track + "," + sector + "," + block, JSON.stringify(FileSystemDeviceDriver.cell));
-                    }
-                }
-            }
-
-            Control.clearDisk();
-            Control.loadDisk();
 
             _StdOut.putText("Disk successfully formatted");
 

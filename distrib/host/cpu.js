@@ -114,6 +114,7 @@ var TSOS;
             if (_Kernel.runningQueue.length == 0) {
                 this.terminateOS();
             }
+            console.log("Terminate");
         };
         Cpu.prototype.terminateOS = function () {
             //mark isExecuting as false

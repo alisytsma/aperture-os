@@ -56,6 +56,7 @@ module TSOS {
 
             console.log("Free mem: " + TSOS.MemoryManager.allocateMemory());
 
+
             _Kernel.krnTrace('CPU cycle');
             TSOS.Scheduler.cycleCount++;
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -82,6 +83,7 @@ module TSOS {
                     this.terminateProgram();
                 }
             }
+
         }
 
         public terminateProgram(): void {
@@ -122,6 +124,8 @@ module TSOS {
             if(_Kernel.runningQueue.length == 0){
                 this.terminateOS();
             }
+
+            console.log("Terminate");
         }
 
         public terminateOS(): void {
