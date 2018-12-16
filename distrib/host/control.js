@@ -222,6 +222,10 @@ var TSOS;
         };
         Control.updatePCB = function () {
             this.clearPCB();
+            //sort the running queue by processId
+            _Kernel.readyQueue.sort(function (a, b) {
+                return a.processId - b.processId;
+            });
             //find table div and set id
             var divPCB = document.getElementById("divPCB");
             this.tblPCB.setAttribute("id", "tablePCB");

@@ -4,7 +4,7 @@
 
 
 /* ------------
-     Scheduler.ts
+     Scheduler.tss
 
      Requires global.ts.
      ------------ */
