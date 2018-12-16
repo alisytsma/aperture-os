@@ -107,10 +107,6 @@ module TSOS {
 
                             }
                         } else {
-                            //sort the running queue by processId
-                            _Kernel.readyQueue.sort(function(a, b){
-                                return a.processId-b.processId
-                            });
                             _CPU.runningPID = 0;
                             _CPU.program = _Kernel.readyQueue[_CPU.runningPID];
                         }

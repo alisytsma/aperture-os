@@ -2,7 +2,7 @@
 ///<reference path="deviceDriver.ts" />
 
 /* ----------------------------------
-   FileSystemDeviceDriver.ts
+   FileSystemDeviceDriver.tss
    Requires deviceDriver.ts
    ---------------------------------- */
 
@@ -77,11 +77,8 @@ module TSOS {
             retrievedData = sessionStorage.getItem(this.trackLocation + "," + this.sectorLocation +"," + this.blockLocation).toString();
             block = JSON.parse(retrievedData);
 
-            console.log("Location: " + this.trackLocation + "," + this.sectorLocation +"," + this.blockLocation);
-
             for(var i = 0; i < content.length; i++) {
                 block[i+4] = content[i].toString();
-                console.log("Content: " + block[i+4]);
                 sessionStorage.setItem(this.trackLocation + "," + this.sectorLocation + "," + this.blockLocation, JSON.stringify(block));
             }
 
@@ -133,7 +130,6 @@ module TSOS {
                             return "," + sector + "," + block;
                         }
 
-                        console.log("sec: " + this.sectorLocation + " block: " + this.blockLocation);
                     }
                 }
             }
@@ -205,23 +201,33 @@ module TSOS {
             return true;
         }
 
-        public static rollIn(input: string, track: number): void {
-
+        public static rollInWrite(input: string, track: number, block: number, startingPos: number): void {
             // get data from disk and parse it
-            var retrievedData = sessionStorage.getItem(track + ",0,0");
+            var retrievedData = sessionStorage.getItem(track + ",0," + block);
             var parsedData = JSON.parse(retrievedData);
             // data starts at position 3
             var position = 3;
-            for (var i = 0; i < input.length; i++) {
+            for (var i = startingPos; position < 64; i++) {
                 // replace the parsed data with the input if it's not a space
                 if(input.charAt(i) != " ") {
                     parsedData[position] = input.substring(i, i + 2).toUpperCase();
                     i += 2;
                     position++;
+                    if(input.charAt(i) == null){
+                        break;
+                    }
                 }
             }
             // set the data at the right position
-            sessionStorage.setItem(track.toString() + ",0,0", JSON.stringify(parsedData));
+            sessionStorage.setItem(track.toString() + ",0," + block, JSON.stringify(parsedData));
+        }
+
+        public static rollIn(input: string, track: number): void {
+
+            this.rollInWrite(input, track, 0, 0);
+            this.rollInWrite(input, track, 1, 183);
+            this.rollInWrite(input, track, 2, 366);
+            this.rollInWrite(input, track, 3, 549);
 
             // update disk
             Control.clearDisk();
@@ -234,16 +240,33 @@ module TSOS {
             // set segment of disk pcb equal to first open memory spot
             _Kernel.pcbDiskList[0].segment = TSOS.MemoryManager.allocateMemory();
 
-            console.log("Roll " + _Kernel.pcbDiskList[0].processId + " out into memory segment " + _Kernel.pcbDiskList[0].segment);
 
-            var retrievedData;
-            retrievedData = sessionStorage.getItem(track + ",0,0");
+            var retrievedData0 = sessionStorage.getItem(track + ",0,0");
+            var retrievedData1 = sessionStorage.getItem(track + ",0,1");
+            var retrievedData2 = sessionStorage.getItem(track + ",0,2");
+            var retrievedData3 = sessionStorage.getItem(track + ",0,3");
+
             // parse the retrieved data
-            var parsedData = JSON.parse(retrievedData);
+            var parsedData0 = JSON.parse(retrievedData0);
+            var parsedData1 = JSON.parse(retrievedData1);
+            var parsedData2 = JSON.parse(retrievedData2);
+            var parsedData3 = JSON.parse(retrievedData3);
+
             // delete the first 3 bits (pointer)
-            parsedData.splice(0,3);
+            parsedData0.splice(0,3);
+            parsedData1.splice(0,3);
+            parsedData2.splice(0,3);
+            parsedData3.splice(0,3);
+
+            console.log("Stringify: " + JSON.stringify(parsedData0 + parsedData1 + parsedData2 + parsedData3));
+
+            var stringify0 = JSON.stringify(parsedData0);
+            var stringify1 = JSON.stringify(parsedData1);
+            var stringify2 = JSON.stringify(parsedData2);
+            var stringify3 = JSON.stringify(parsedData3);
+
             // add this data to memory in the right segment
-            TSOS.MemoryManager.updateMemory(JSON.stringify(parsedData), _Kernel.pcbDiskList[0].segment);
+            TSOS.MemoryManager.updateMemory(stringify0 + stringify1 + stringify2 + stringify3, _Kernel.pcbDiskList[0].segment);
             if(_Kernel.readyQueue.length < 3) {
                 // add to ready and running queues
                 _Kernel.readyQueue.push(_Kernel.pcbDiskList[0]);
