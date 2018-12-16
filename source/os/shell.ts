@@ -198,6 +198,12 @@ module TSOS {
                 " - format the disk");
             this.commandList[this.commandList.length] = sc;
 
+            // getschedule
+            sc = new ShellCommand(this.getSchedule,
+                "getschedule",
+                " - get the current scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+
 
 
 
@@ -745,10 +751,12 @@ module TSOS {
                         var retrievedData = sessionStorage.getItem("0," + sector + "," + block);
                         var parsedData = JSON.parse(retrievedData);
 
+                        // mark where it terminates
                         if(parsedData[cell] == "00"){
                             dataUntil = cell;
                         }
 
+                        // if data until was moved, build the file name
                         if(dataUntil > 4) {
                             for (var j = 4; j <= dataUntil; j++) {
                                 if(String.fromCharCode(parseInt(parsedData[j], 16)) != ""){
@@ -757,29 +765,26 @@ module TSOS {
                             }
                         }
 
-                        console.log("file builder: " + fileBuilder.trim());
-
-                        var found = false;
+                        // if file builder isn't blanl
                         if(fileBuilder != "") {
-                            for (var i = 0; i < foundFiles.length; i++) {
-                                if (fileBuilder.trim() == foundFiles[i].trim()) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if(!found){
-                                foundFiles.push(fileBuilder.trim());
-                            }
+                            // add it to the array
+                            foundFiles.push(fileBuilder);
                         }
+                        // reset file builder
                         fileBuilder = "";
                     }
                 }
             }
+
+            // if array is empty, print it's blank
             if(foundFiles.length == 0) {
                 _StdOut.putText("No files found");
             } else {
-                for(var i = 0; i < foundFiles.length; i++){
-                    _StdOut.putText(foundFiles[i].trim() + " ");
+                // loop through array printing every 64th file name since there's repeates
+                for(var i = 0; i < foundFiles.length; i++) {
+                    if (i % 64 == 0) {
+                        _StdOut.putText(foundFiles[i] + " ");
+                    }
                 }
             }
 
@@ -790,7 +795,33 @@ module TSOS {
         public setSchedule(args){
 
             TSOS.Scheduler.schedulingAlgo = args[0];
-            _StdOut.putText("Scheduling algorithm set to " + args[0]);
+            if(TSOS.Scheduler.schedulingAlgo == "rr"){
+                _StdOut.putText("Scheduling algorithm set to Round Robin");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "fcfs"){
+                _StdOut.putText("Scheduling algorithm set to First Come First Serve");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "priority"){
+                _StdOut.putText("Scheduling algorithm set to Priority");
+            } else {
+                _StdOut.putText("No valid algorithm set, defaulting to round robin");
+                TSOS.Scheduler.schedulingAlgo = "rr";
+            }
+
+        }
+
+        public getSchedule(){
+
+            if(TSOS.Scheduler.schedulingAlgo == "rr"){
+                _StdOut.putText("Scheduling algorithm set to Round Robin");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "fcfs"){
+                _StdOut.putText("Scheduling algorithm set to First Come First Serve");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "priority"){
+                _StdOut.putText("Scheduling algorithm set to Priority");
+            }
+
 
         }
 

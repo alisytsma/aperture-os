@@ -142,7 +142,6 @@ module TSOS {
                     TSOS.Scheduler.priorityAlgo();
                 }
                 else {
-                    _StdOut.putText("No valid algorithm set, defaulting to round robin");
                     TSOS.Scheduler.schedulingAlgo = "rr";
                     TSOS.Scheduler.roundRobin();
                 }

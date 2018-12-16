@@ -3,9 +3,7 @@
 
 /* ----------------------------------
    FileSystemDeviceDriver.ts
-
    Requires deviceDriver.ts
-
    ---------------------------------- */
 
 module TSOS {
@@ -222,18 +220,8 @@ module TSOS {
                     position++;
                 }
             }
-
-
             // set the data at the right position
-            sessionStorage.setItem(track.toString() + ",0,0", JSON.stringify(parsedData.splice(0,64)));
-            parsedData.splice(0,64);
-            sessionStorage.setItem(track.toString() + ",0,1", JSON.stringify(parsedData.splice(0,64)));
-            parsedData.splice(0,64);
-            sessionStorage.setItem(track.toString() + ",0,2", JSON.stringify(parsedData.splice(0,64)));
-            parsedData.splice(0,64);
-            sessionStorage.setItem(track.toString() + ",0,3", JSON.stringify(parsedData.splice(0,64)));
-            parsedData.splice(0,64);
-
+            sessionStorage.setItem(track.toString() + ",0,0", JSON.stringify(parsedData));
 
             // update disk
             Control.clearDisk();
@@ -248,23 +236,10 @@ module TSOS {
 
             console.log("Roll " + _Kernel.pcbDiskList[0].processId + " out into memory segment " + _Kernel.pcbDiskList[0].segment);
 
+            var retrievedData;
+            retrievedData = sessionStorage.getItem(track + ",0,0");
             // parse the retrieved data
-            var parsedData0 = JSON.parse(sessionStorage.getItem(track + ",0,0"));
-            var parsedData1 = JSON.parse(sessionStorage.getItem(track + ",0,1"));
-            var parsedData2 = JSON.parse(sessionStorage.getItem(track + ",0,2"));
-            var parsedData3 = JSON.parse(sessionStorage.getItem(track + ",0,3"));
-            var parsedData = parsedData0.concat(parsedData1, parsedData2, parsedData3);
-
-
-
-            console.log("PARSE0: " + parsedData0);
-            console.log("PARSE1: " + parsedData1);
-            console.log("PARSE2: " + parsedData2);
-            console.log("PARSE3: " + parsedData2);
-            console.log("PARSE: " + parsedData);
-
-
-
+            var parsedData = JSON.parse(retrievedData);
             // delete the first 3 bits (pointer)
             parsedData.splice(0,3);
             // add this data to memory in the right segment
@@ -281,13 +256,9 @@ module TSOS {
             this.formatDisk(track);
             // remove from disk list
             _Kernel.pcbDiskList.splice(0,1);
-
             // update disk
             Control.clearDisk();
             Control.loadDisk();
-
-            _CPU.program = _Kernel.readyQueue[replacing];
-
 
         }
 
