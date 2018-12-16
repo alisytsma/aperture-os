@@ -90,16 +90,31 @@ td {
   width: 10%;
 }
 
+#divMemory, #divDisk, #tablePCB, #tableCpu, #display, #taHostLog{
+  box-shadow: 10px 10px 5px grey;
+}
+
+
+
 #taHostLog{
   width: 350px;
-  height: 400px;
+  height: 450px;
   float: left;
 }
 
 #divUserProgramInput {
-  float:left;
+  padding: 10px;
+  float: left;
 }
 
 label {
   font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+  color:pink;
+}
+
+#divButtonBar{
+  background-color: lightgray;
+  padding: 20px;
+  box-shadow: 10px 10px 5px white;
 }
