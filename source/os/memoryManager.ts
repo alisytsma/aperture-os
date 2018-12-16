@@ -15,6 +15,8 @@ module TSOS {
 
         // update memory with new values
         public static updateMemory(input: string, segment: number):void {
+            console.log("Memory1: " + input);
+
             var position = 0;
             for (var i = 0; i < input.length; i++) {
                 if(input.charAt(i) != " " && input.charAt(i) != "\"" && input.charAt(i) != "," && input.charAt(i) != "[" && input.charAt(i) != "]") {
@@ -23,6 +25,8 @@ module TSOS {
                     position++;
                 }
             }
+
+            console.log("Memory2: " + _Memory.memArray[segment]);
             // set the end of the program to last position
             this.endProgram = position;
             // clear memory table and then load it again
