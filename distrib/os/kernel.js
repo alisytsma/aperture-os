@@ -1,5 +1,12 @@
 ///<reference path="../globals.ts" />
 ///<reference path="queue.ts" />
+///<reference path="../host/control.ts" />
+///<reference path="deviceDriverKeyboard.ts" />
+///<reference path="fileSystemDeviceDriver.ts" />
+///<reference path="shell.ts" />
+///<reference path="../host/memory.ts" />
+///<reference path="processControlBlock.ts" />
+///<reference path="scheduler.ts" />
 /* ------------
      Kernel.ts
 
@@ -13,8 +20,13 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
-    var Kernel = (function () {
+    var Kernel = /** @class */ (function () {
         function Kernel() {
+            //list of programs that are ready and waiting
+            this.readyQueue = [];
+            //list of programs that are currently being run
+            this.runningQueue = [];
+            this.pcbDiskList = [];
         }
         //
         // OS Startup and Shutdown Routines
@@ -39,6 +51,8 @@ var TSOS;
             //
             // ... more?
             //
+            //set status
+            document.getElementById("status").innerHTML = "Status: Running | ";
             // Enable the OS Interrupts.  (Not the CPU clock interrupt, as that is done in the hardware sim.)
             this.krnTrace("Enabling the interrupts.");
             this.krnEnableInterrupts();
@@ -46,6 +60,17 @@ var TSOS;
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
             _OsShell.init();
+            //create new memory instance
+            _Memory = new TSOS.Memory();
+            _Memory.init();
+            // ... Create and initialize the CPU (because it's part of the hardware)  ...
+            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            TSOS.Control.updatePCB();
+            // Load the file system device driver
+            this.krnTrace("Loading the file system device driver.");
+            _krnFileDriver = new TSOS.FileSystemDeviceDriver(); // Construct it.
+            _krnFileDriver.init(); // Call the initialization routine.
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -75,11 +100,26 @@ var TSOS;
                 var interrupt = _KernelInterruptQueue.dequeue();
                 this.krnInterruptHandler(interrupt.irq, interrupt.params);
             }
-            else if (_CPU.isExecuting) {
+            else if (_CPU.isExecuting && _CPU.singleStep == false) { // If there are no interrupts then run one CPU cycle if there is anything being processed. {
                 _CPU.cycle();
             }
-            else {
+            else { // If there are no interrupts and there is nothing being executed then just be idle. {
                 this.krnTrace("Idle");
+            }
+            if (_CPU.scheduling == true) {
+                if (TSOS.Scheduler.schedulingAlgo == "rr") {
+                    TSOS.Scheduler.roundRobin();
+                }
+                else if (TSOS.Scheduler.schedulingAlgo == "fcfs") {
+                    TSOS.Scheduler.FCFS();
+                }
+                else if (TSOS.Scheduler.schedulingAlgo == "priority") {
+                    TSOS.Scheduler.priorityAlgo();
+                }
+                else {
+                    TSOS.Scheduler.schedulingAlgo = "rr";
+                    TSOS.Scheduler.roundRobin();
+                }
             }
         };
         //
@@ -111,6 +151,9 @@ var TSOS;
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
                     break;
+                case CONTEXT_SWITCH:
+                    TSOS.Scheduler.contextSwitch(params);
+                    break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
             }
@@ -133,6 +176,23 @@ var TSOS;
         // - ReadFile
         // - WriteFile
         // - CloseFile
+        Kernel.prototype.createProcess = function (pid, memory, priority) {
+            //create a new process
+            var newProc = new TSOS.ProcessControlBlock(pid.toString(), TSOS.MemoryManager.allocateMemory(), priority);
+            //add it to the ready queue
+            if (memory) {
+                this.readyQueue.push(newProc);
+                //set the current program to the new process
+                _CPU.program = newProc;
+            }
+            else {
+                this.pcbDiskList.push(newProc);
+            }
+            //update the PCB table
+            TSOS.Control.updatePCB();
+            //initialize
+            newProc.init();
+        };
         //
         // OS Utility Routines
         //
@@ -151,13 +211,25 @@ var TSOS;
                     TSOS.Control.hostLog(msg, "OS");
                 }
             }
+            //create displayDate and displayTime to get date and time
+            var displayDate = new Date().toLocaleDateString();
+            var displayTime = new Date();
+            //Update time in task bar
+            document.getElementById("time").innerHTML = "Time: " + displayDate + " " + displayTime.getHours()
+                + ":" + displayTime.getMinutes() + ":" + displayTime.getSeconds();
         };
         Kernel.prototype.krnTrapError = function (msg) {
+            //clear the screen, reset the position, and print text at top
+            _Console.clearScreen();
+            _Console.resetXY();
             TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            _DrawingContext.fillStyle = 'blue';
+            _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+            _StdOut.putText("OS ERROR - TRAP: " + msg);
             this.krnShutdown();
         };
         return Kernel;
-    })();
+    }());
     TSOS.Kernel = Kernel;
 })(TSOS || (TSOS = {}));

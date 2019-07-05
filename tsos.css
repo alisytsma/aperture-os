@@ -1,8 +1,10 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/linen.png) repeat;
-  font-family: Helvetica, Verdana, Arial, sans-serif;
+  background: #DAE2F8;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #D6A4A4, #DAE2F8);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #D6A4A4, #DAE2F8); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  font-family: Tahoma, Geneva, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
@@ -24,15 +26,15 @@ h2 {
 }
 
 h3 {
-  font-family: Helvetica, Verdana, Arial, sans-serif;
+  font-family: Tahoma, Geneva, sans-serif;
   font-size: 16pt;
   font-weight: normal;
   font-style: normal;
 }
 
 #display {
-  background-color:#DFDBC3;
-  border: 2px solid red;
+  background-color:white;
+  border: 2px solid darkgray;
   cursor: default;
 }
 
@@ -42,7 +44,77 @@ h3 {
 
 .footerText {
   color: black;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Tahoma, Geneva, sans-serif;
   font-size: 8pt;
   text-align: center;
+}
+
+#tableMemory, #tablePCB, #tableCpu {
+  padding: 10px;
+  overflow:auto;
+  background-color:white;
+}
+#tableMemory td, #tablePCB td, #tableCpu td {
+  text-align: center;
+}
+
+#tableDisk {
+  cellspacing:0px;
+  cellpadding:0px;
+  background-color: white;
+}
+
+#divDisk {
+  overflow-y: scroll;
+  height: 300px;
+  width: 800px;
+  background: white;
+  padding: 10px;
+  float: right;
+}
+
+#divMemory {
+  background: white;
+  overflow-y: scroll;
+  height: 400px;
+  width: 300px;
+  padding-right: 10px;
+}
+
+#spacing{
+  float:left;
+  width: 100px;
+}
+
+td {
+  width: 10%;
+}
+
+#divMemory, #divDisk, #tablePCB, #tableCpu, #display, #taHostLog{
+  box-shadow: 10px 10px 5px grey;
+}
+
+
+
+#taHostLog{
+  width: 350px;
+  height: 450px;
+  float: left;
+}
+
+#divUserProgramInput {
+  padding: 10px;
+  float: left;
+}
+
+label {
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+  color:pink;
+}
+
+#divButtonBar{
+  background: rgba(47,53,60,0.5);
+  padding: 20px;
+  box-shadow: 10px 10px 5px white;
 }

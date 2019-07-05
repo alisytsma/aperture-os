@@ -2,37 +2,48 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-   <meta name="author"             content="Alan G. Labouseur" />
+   <meta name="author"             content="Ali Sytsma" />
    <link rel="stylesheet" href="tsos.css" type="text/css" media="screen" />
    <title>
       TSOS - a browser-based virtual Operating System in TypeScript
    </title>
 
+
    <!-- Globals CONSTANTS and _Variables. Must included be first. -->
    <script type="text/javascript" src="distrib/globals.js"></script>
 
-   <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+
+    <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
+    <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
 
-   <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+
+    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
    <script type="text/javascript" src="distrib/os/canvastext.js"></script>
    <script type="text/javascript" src="distrib/os/console.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriver.js"></script>
    <script type="text/javascript" src="distrib/os/deviceDriverKeyboard.js"></script>
-   <script type="text/javascript" src="distrib/os/queue.js"></script>
+    <script type="text/javascript" src="distrib/os/fileSystemDeviceDriver.js"></script>
+    <script type="text/javascript" src="distrib/os/queue.js"></script>
+   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+   <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
    <script type="text/javascript" src="distrib/os/shell.js"></script>
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
-   <script type="text/javascript" src="distrib/os/userCommand.js"></script>
-   <script type="text/javascript" src="distrib/os/kernel.js"></script>
+    <script type="text/javascript" src="distrib/os/scheduler.js"></script>
+    <script type="text/javascript" src="distrib/os/kernel.js"></script>
 
-   <!-- Other Routines -->
+    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
-   <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
-   
+   <!-- Uncomment the line below to enable GLaDOS testing.-->
+   <script type="text/javascript" src="test/glados-ip4.js"></script>
+
+
+
 </head>
 
 <body onload="onDocumentLoad()">
@@ -40,7 +51,9 @@
 <div id="divMain" style="width:100%;">
 
    <div id="divButtonBar" style="margin:4px;">
-      <input type="button"
+       <label style = "float:right; font-size: 20px;">Aperture OS</label>
+
+       <input type="button"
              id = "btnStartOS"
              name="brnStartOS"
              class="normal_button"
@@ -65,7 +78,31 @@
              value="Reset"
              tabindex="2"
              onclick="TSOS.Control.hostBtnReset_click(this);">
+       <input type="button"
+              id = "btnStepEna"
+              name="btnStepEna"
+              class="normal_button"
+              disabled="disabled"
+              value="Enable Single Step Mode"
+              tabindex="2"
+              onclick="TSOS.Control.hostBtnStepEna_click(this);">
+       <input type="button"
+              id = "btnStep"
+              name="btnStep"
+              class="normal_button"
+              disabled="disabled"
+              value=">"
+              tabindex="2"
+              onclick="TSOS.Control.hostBtnStep_click(this);">
+       <ul style="display:flex; list-style:none;">
+           <li id="status" style = "padding-right: 5px">Status: Off </li>
+           <li id = "time"></li>
+       </ul>
+
+
    </div>
+
+    <br>
 
    <div id="divConsole" style="margin:4px; width:500px; height:500px; float:left;">
       <canvas id="display"
@@ -87,17 +124,56 @@
       </label>
    </div>
 
-   <div id="divUserProgramInput" style="margin-left:520px;">
+    <div id="divPCB" style="float:left; padding: 10px;">
+        <label>Process Control Block</label>
+    </div>
+
+    <div id="divCpu" style="float:left; padding: 10px;">
+        <label>
+            CPU        </label>
+
+        <br>
+            <table id = "tableCpu">
+                <tr style = "font-weight:bold">
+                    <td>PC</td>
+                    <td>IR</td>
+                    <td>Acc</td>
+                    <td>X</td>
+                    <td>Y</td>
+                    <td>ZF</td>
+                </tr>
+                <tr>
+                    <td id = "PC"></td>
+                    <td id = "IR"></td>
+                    <td id = "Acc"></td>
+                    <td id = "Xreg"></td>
+                    <td id = "Yreg"></td>
+                    <td id = "Zflag"></td>
+                </tr>
+            </table>
+    </div>
+
+
+    <div id="divUserProgramInput" style="margin-left:520px;">
       <label>
-         User Program Input
-         <br>
+         User Program Input      </label>
+
+        <br>
          <textarea name="taProgramInput"
                    id  ="taProgramInput"
                    rows="8"
                    cols="48"
          ></textarea>
-      </label>
    </div>
+    <div id="divMemory" style="float:left; padding: 10px;">
+        <label>Memory</label>
+    </div>
+
+    <div id="spacing">...</div>
+
+    <div id="divDisk" style="float:left;">
+        <label>Disk</label>
+    </div>
 </div>
 
 <p class="footerText" style="clear:both;">

@@ -2,8 +2,10 @@
 ///<reference path="../utils.ts" />
 ///<reference path="shellCommand.ts" />
 ///<reference path="userCommand.ts" />
+///<reference path="memoryManager.ts" />
+///<reference path="../host/control.ts" />
 /* ------------
-   Shell.ts
+   Shell.tss
 
    The OS Shell - The "command line interface" (CLI) for the console.
 
@@ -13,13 +15,15 @@
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
 (function (TSOS) {
-    var Shell = (function () {
+    var Shell = /** @class */ (function () {
         function Shell() {
             // Properties
             this.promptStr = ">";
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
+            this.status = "Ready";
+            this.pidCount = -1;
         }
         Shell.prototype.init = function () {
             var sc;
@@ -49,9 +53,66 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
-            //
+            // roll
+            sc = new TSOS.ShellCommand(this.shellRoll, "roll", "- Roll for initiative.");
+            this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date and time.");
+            this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new TSOS.ShellCommand(this.shellLocation, "whereami", "- Display location.");
+            this.commandList[this.commandList.length] = sc;
+            // status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Set status message.");
+            this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new TSOS.ShellCommand(this.load, "load", " - Load and validate user input.");
+            this.commandList[this.commandList.length] = sc;
+            // bluescreen
+            sc = new TSOS.ShellCommand(this.blueScreen, "bluescreen", " - Force an error that causes blue screen.");
+            this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.run, "run", "<integer> - Run a command by process id.");
+            this.commandList[this.commandList.length] = sc;
+            // clearmem
+            sc = new TSOS.ShellCommand(this.clearmem, "clearmem", " - Clear all partitions of memory");
+            this.commandList[this.commandList.length] = sc;
+            // ps
+            sc = new TSOS.ShellCommand(this.ps, "ps", " - Display current processes in the ready queue and their status");
+            this.commandList[this.commandList.length] = sc;
+            // kill
+            sc = new TSOS.ShellCommand(this.kill, "kill", "<integer> - kill process specified by process ID");
+            this.commandList[this.commandList.length] = sc;
+            // quantum
+            sc = new TSOS.ShellCommand(this.quantum, "quantum", "<integer> - let the user set the Round Robin quantum");
+            this.commandList[this.commandList.length] = sc;
+            // run all
+            sc = new TSOS.ShellCommand(this.runAll, "runall", " - run all ready programs");
+            this.commandList[this.commandList.length] = sc;
+            // create file
+            sc = new TSOS.ShellCommand(this.createFile, "create", "<string> - create file");
+            this.commandList[this.commandList.length] = sc;
+            // write file
+            sc = new TSOS.ShellCommand(this.writeFile, "write", "<string> <string>- write file");
+            this.commandList[this.commandList.length] = sc;
+            // read file
+            sc = new TSOS.ShellCommand(this.readFile, "read", "<string> - read file");
+            this.commandList[this.commandList.length] = sc;
+            // delete file
+            sc = new TSOS.ShellCommand(this.deleteFile, "delete", "<string> - delete file");
+            this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new TSOS.ShellCommand(this.ls, "ls", " - list all files");
+            this.commandList[this.commandList.length] = sc;
+            // setSchedule
+            sc = new TSOS.ShellCommand(this.setSchedule, "setschedule", "[rr, fcfs, priority] - set scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
+            // format
+            sc = new TSOS.ShellCommand(this.format, "format", " - format the disk");
+            this.commandList[this.commandList.length] = sc;
+            // getschedule
+            sc = new TSOS.ShellCommand(this.getSchedule, "getschedule", " - get the current scheduling algorithm");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         };
@@ -89,13 +150,13 @@ var TSOS;
             }
             else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
-                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) {
+                if (this.curses.indexOf("[" + TSOS.Utils.rot13(cmd) + "]") >= 0) { // Check for curses.
                     this.execute(this.shellCurse);
                 }
-                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) { // Check for apologies.
                     this.execute(this.shellApology);
                 }
-                else {
+                else { // It's just a bad command. {
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -196,6 +257,45 @@ var TSOS;
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "roll":
+                        _StdOut.putText("Roll begins a (very) short game of Dungeons and Dragons.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears all the text on the console.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Man provides more details about commands.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shutdown powers off the virtual OS but leaves processes running.");
+                        break;
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version of TSOS.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace <on | off> enables or disables the OS trace.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 <string> performs rot13 encryption on the entered string.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt sets the input prompt for the console.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Date prints the current time and date in your timezone.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami displays your current location in the universe.");
+                        break;
+                    case "status":
+                        _StdOut.putText("Status <string> sets the status message on the task bar.");
+                        break;
+                    case "load":
+                        _StdOut.putText("Load loads the content in the User Progam Input box and checks if it is valid hex or not.");
+                        break;
+                    case "bluescreen":
+                        _StdOut.putText("Bluescreen forces the OS to bluescreen, or causes a fatal kernel error that requires restarting.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -246,7 +346,347 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellRoll = function () {
+            var damage = Math.floor(Math.random() * 5) + 1;
+            var playerResult = Math.floor(Math.random() * 20) + 1;
+            var enemyResult = Math.floor(Math.random() * 20) + 1;
+            var luckRoll = Math.floor(Math.random() * 20) + 1;
+            _StdOut.putText("A challenger approaches. ");
+            _StdOut.advanceLine();
+            _StdOut.putText("You've rolled a " + playerResult + " for initiative. ");
+            _StdOut.advanceLine();
+            _StdOut.putText("The challenger rolled a " + enemyResult + " for initiative. ");
+            if (enemyResult > playerResult) {
+                _StdOut.advanceLine();
+                _StdOut.putText("The challenger attacks. They deal " + damage + " damage. ");
+                _StdOut.advanceLine();
+                _StdOut.putText("You are bleeding and attempt to run away.");
+                _StdOut.advanceLine();
+                _StdOut.putText("You roll a " + luckRoll + ". ");
+                if (luckRoll >= 10) {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("You have successfully evaded your attacker.");
+                }
+                else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("You failed. You have been defeated by the challenger.");
+                }
+            }
+            else {
+                _StdOut.advanceLine();
+                _StdOut.putText("You attack. You deal " + damage + " damage. ");
+                _StdOut.advanceLine();
+                _StdOut.putText("They are bleeding and attempt to run away.");
+                _StdOut.advanceLine();
+                _StdOut.putText("They roll a " + luckRoll + ". ");
+                if (luckRoll >= 10) {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("They have successfully evaded you.");
+                }
+                else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("They failed. You have defeated the challenger.");
+                }
+            }
+        };
+        Shell.prototype.shellDate = function () {
+            var today = new Date();
+            var date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            _StdOut.putText("It is " + time + " on " + date);
+        };
+        Shell.prototype.shellLocation = function () {
+            if (_SarcasticMode) {
+                _StdOut.putText("How about you go outside for once in your life and look?");
+            }
+            else {
+                _StdOut.putText("Earth, I'd assume.");
+            }
+        };
+        Shell.prototype.shellStatus = function (args) {
+            //if status arguments
+            if (args.length > 0) {
+                //loop for length of arguments to add them together to make a
+                //sentence with a space inbetween
+                for (var i = 0; i < args.length; i++) {
+                    var sentenceBuilder = args[i];
+                    this.status += sentenceBuilder + " ";
+                }
+            }
+            //print update that status has been changed
+            _StdOut.putText("Status set to " + this.status);
+            //update status on host
+            document.getElementById("status").innerHTML = "Status: " + this.status + " | ";
+        };
+        Shell.prototype.load = function (args) {
+            var input = (document.getElementById("taProgramInput").value);
+            var valid = true;
+            var priority = 0;
+            _StdOut.putText("Loading...");
+            _StdOut.advanceLine();
+            if (args[0] != null) {
+                priority = args[0];
+            }
+            for (var i = 0; i < input.length; i++) {
+                if (((i + 1) % 3 == 0) && input.charAt(i) != " ") {
+                    _StdOut.putText("Must add a space at position " + i);
+                    valid = false;
+                    break;
+                }
+                if (input.charAt(i).match("-?[0-9a-fA-F\\s]+")) {
+                    valid = true;
+                }
+                else {
+                    _StdOut.putText("Character " + input.charAt(i) + " at position " + i + " is not valid hex input.");
+                    valid = false;
+                    break;
+                }
+            }
+            if (input == "") {
+                valid = false;
+                _StdOut.putText("No text entered, not valid hex input.");
+            }
+            if (valid) {
+                if (TSOS.MemoryManager.checkMemory()) {
+                    _OsShell.pidCount++;
+                    _Kernel.createProcess(_OsShell.pidCount, true, priority);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    TSOS.MemoryManager.updateMemory(input.toString(), _CPU.program.segment);
+                }
+                else if (TSOS.FileSystemDeviceDriver.checkDisk(2) && TSOS.FileSystemDeviceDriver.trackFree) {
+                    _OsShell.pidCount++;
+                    _Kernel.createProcess(_OsShell.pidCount, false, priority);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    TSOS.FileSystemDeviceDriver.trackFree = false;
+                    TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 2);
+                }
+                else if (TSOS.FileSystemDeviceDriver.checkDisk(3) && TSOS.FileSystemDeviceDriver.trackFree) {
+                    _OsShell.pidCount++;
+                    _Kernel.createProcess(_OsShell.pidCount, false, priority);
+                    _StdOut.putText("Loaded with a PID of " + String(_OsShell.pidCount));
+                    TSOS.FileSystemDeviceDriver.trackFree = false;
+                    TSOS.FileSystemDeviceDriver.rollIn(input.toString(), 3);
+                }
+                else {
+                    _StdOut.putText("Memory and disk full");
+                }
+            }
+        };
+        //force a kernel error
+        Shell.prototype.blueScreen = function () {
+            _Kernel.krnTrapError("Error caused by user");
+        };
+        //run a program
+        Shell.prototype.run = function (args) {
+            _CPU.scheduling = false;
+            var validPID = false;
+            //if the arg matches a process id that's in the ready queue and it hasn't been run yet, set to valid
+            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
+                //console.log("Stat " + _Kernel.readyQueue[i].processId + ": "+ _Kernel.readyQueue[i].status);
+                if (_Kernel.readyQueue[i].processId == args && _Kernel.readyQueue[i].status == "Ready")
+                    validPID = true;
+            }
+            //if valid
+            if (validPID) {
+                //set running pid to args
+                _CPU.runningPID = args;
+                //set program equal to the one we're running
+                _CPU.program = _Kernel.readyQueue[args];
+                //add to running queue
+                _Kernel.runningQueue.push(_CPU.program);
+                //reset CPU
+                _CPU.position = 0;
+                _CPU.Acc = "0";
+                _CPU.IR = "0";
+                _CPU.Xreg = "0";
+                _CPU.Yreg = "0";
+                _CPU.Zflag = "0";
+                _CPU.isExecuting = false;
+                TSOS.Control.updateCPU(_CPU.position, _CPU.Acc, _CPU.IR, _CPU.Xreg, _CPU.Yreg, _CPU.Zflag);
+                //disable single step
+                if (_CPU.singleStep == false)
+                    _CPU.isExecuting = true;
+            }
+            else {
+                _StdOut.putText("Not a valid PID");
+            }
+        };
+        //clear all memory partitions
+        Shell.prototype.clearmem = function () {
+            //mark all as free
+            _Memory.mem0Free = true;
+            _Memory.mem1Free = true;
+            _Memory.mem2Free = true;
+            //clear memory
+            TSOS.MemoryAccessor.clearMem();
+            //clear table and reload it
+            TSOS.Control.clearTable();
+            TSOS.Control.loadTable();
+        };
+        //display processes in ready queue and their status
+        Shell.prototype.ps = function () {
+            for (var i = 0; i < _Kernel.readyQueue.length; i++) {
+                _StdOut.putText("Process " + _Kernel.readyQueue[i].processId + " is " + _Kernel.readyQueue[i].status);
+                _StdOut.advanceLine();
+            }
+        };
+        //kill a process
+        Shell.prototype.kill = function (args) {
+            _CPU.program = _Kernel.readyQueue[args];
+            _CPU.terminateProgram();
+        };
+        //set quantum
+        Shell.prototype.quantum = function (args) {
+            _CPU.quantum = args;
+        };
+        //run all programs
+        Shell.prototype.runAll = function () {
+            _CPU.scheduling = true;
+            //add to running queue
+            _Kernel.runningQueue = _Kernel.readyQueue.slice(0);
+            //if(_Kernel.pcbDiskList.length >= 1)
+            //    _Kernel.runningQueue.push(_Kernel.pcbDiskList[0]);
+            //console.log("Running queue length: " + _Kernel.runningQueue.length);
+            //set running pid to args
+            _CPU.runningPID = _Kernel.runningQueue[0].processId;
+            //set program equal to the one we're running
+            _CPU.program = _Kernel.readyQueue[0];
+            //disable single step
+            if (_CPU.singleStep == false)
+                _CPU.isExecuting = true;
+        };
+        Shell.prototype.createFile = function (args) {
+            var hexInput = [];
+            var input = args[0].toString();
+            for (var i = 0; i < input.length; i++) {
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            TSOS.FileSystemDeviceDriver.writeDisk("create", hexInput);
+        };
+        Shell.prototype.readFile = function (args) {
+            var fileName = args[0];
+            var hexName = [];
+            for (var i = 0; i < fileName.length; i++) {
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            if (!TSOS.FileSystemDeviceDriver.findFile(hexName)) {
+                _StdOut.putText("File not found");
+            }
+            else {
+                TSOS.FileSystemDeviceDriver.readDisk(hexName);
+            }
+        };
+        Shell.prototype.writeFile = function (args) {
+            var fileName = args[0];
+            var hexName = [];
+            for (var i = 0; i < fileName.length; i++) {
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            args.splice(0, 1);
+            var input = args.toString();
+            var hexInput = [];
+            for (var i = 0; i < input.length; i++) {
+                hexInput.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            if (!TSOS.FileSystemDeviceDriver.findFile(hexName)) {
+                _StdOut.putText("File not found");
+            }
+            else {
+                TSOS.FileSystemDeviceDriver.writeDisk("write", hexInput);
+            }
+        };
+        Shell.prototype.deleteFile = function (args) {
+            var fileName = args[0];
+            var hexName = [];
+            for (var i = 0; i < fileName.length; i++) {
+                hexName.push(args.toString().charCodeAt(i).toString(16).toUpperCase());
+            }
+            if (!TSOS.FileSystemDeviceDriver.findFile(hexName)) {
+                _StdOut.putText("File not found");
+            }
+            else {
+                TSOS.FileSystemDeviceDriver.deleteDisk(hexName);
+            }
+        };
+        Shell.prototype.ls = function () {
+            var fileBuilder = "";
+            var foundFiles = [];
+            var dataUntil = 4;
+            for (var sector = 0; sector < 8; sector++) {
+                for (var block = 0; block < 8; block++) {
+                    for (var cell = 0; cell < 64; cell++) {
+                        var retrievedData = sessionStorage.getItem("0," + sector + "," + block);
+                        var parsedData = JSON.parse(retrievedData);
+                        // mark where it terminates
+                        if (parsedData[cell] == "00") {
+                            dataUntil = cell;
+                        }
+                        // if data until was moved, build the file name
+                        if (dataUntil > 4) {
+                            for (var j = 4; j <= dataUntil; j++) {
+                                if (String.fromCharCode(parseInt(parsedData[j], 16)) != "") {
+                                    fileBuilder += String.fromCharCode(parseInt(parsedData[j], 16));
+                                }
+                            }
+                        }
+                        // if file builder isn't blanl
+                        if (fileBuilder != "") {
+                            // add it to the array
+                            foundFiles.push(fileBuilder);
+                        }
+                        // reset file builder
+                        fileBuilder = "";
+                    }
+                }
+            }
+            // if array is empty, print it's blank
+            if (foundFiles.length == 0) {
+                _StdOut.putText("No files found");
+            }
+            else {
+                // loop through array printing every 64th file name since there's repeates
+                for (var i = 0; i < foundFiles.length; i++) {
+                    if (i % 64 == 0) {
+                        _StdOut.putText(foundFiles[i] + " ");
+                    }
+                }
+            }
+        };
+        Shell.prototype.setSchedule = function (args) {
+            TSOS.Scheduler.schedulingAlgo = args[0];
+            if (TSOS.Scheduler.schedulingAlgo == "rr") {
+                _StdOut.putText("Scheduling algorithm set to Round Robin");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "fcfs") {
+                _StdOut.putText("Scheduling algorithm set to First Come First Serve");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "priority") {
+                _StdOut.putText("Scheduling algorithm set to Priority");
+            }
+            else {
+                _StdOut.putText("No valid algorithm set, defaulting to round robin");
+                TSOS.Scheduler.schedulingAlgo = "rr";
+            }
+        };
+        Shell.prototype.getSchedule = function () {
+            if (TSOS.Scheduler.schedulingAlgo == "rr") {
+                _StdOut.putText("Scheduling algorithm set to Round Robin");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "fcfs") {
+                _StdOut.putText("Scheduling algorithm set to First Come First Serve");
+            }
+            else if (TSOS.Scheduler.schedulingAlgo == "priority") {
+                _StdOut.putText("Scheduling algorithm set to Priority");
+            }
+        };
+        Shell.prototype.format = function () {
+            TSOS.FileSystemDeviceDriver.formatDisk(0);
+            TSOS.FileSystemDeviceDriver.formatDisk(1);
+            TSOS.FileSystemDeviceDriver.formatDisk(2);
+            TSOS.FileSystemDeviceDriver.formatDisk(3);
+            _StdOut.putText("Disk successfully formatted");
+        };
         return Shell;
-    })();
+    }());
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
